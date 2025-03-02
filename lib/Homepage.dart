@@ -22,7 +22,13 @@ class HomePage extends StatelessWidget {
                 color: Colors.black,),
               ))
         ],
-        title: Text("Fresh Marikiti"),
+        title: Text("Fresh Marikiti",style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          
+
+        ),),
+        centerTitle: true,
         backgroundColor: Colors.green[700],
         automaticallyImplyLeading: false,
         leading: Builder(
@@ -34,6 +40,7 @@ class HomePage extends StatelessWidget {
                 )),
       ),
       drawer: FreshMarikitiDrawer(),
+      
     );
   }
 }

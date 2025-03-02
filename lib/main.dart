@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:marikiti/Homepage.dart';
 import 'package:marikiti/core/constants/View/auth/signup.dart';
+import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Themeprovders.dart';
 import 'package:marikiti/core/constants/providers/google_sign_in_provider.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
@@ -25,6 +26,7 @@ void main() async{
          ChangeNotifierProvider(create: (_)=>Passwordprovider()),
          ChangeNotifierProvider(create: (_)=>ThemeProvider()),
          ChangeNotifierProvider(create: (_)=>CartProvider()), 
+         ChangeNotifierProvider(create: (_)=>CheckoutProvider()),
       ],
       child: const Marikiti(),
     ),
@@ -38,8 +40,18 @@ class Marikiti extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeprovider=Provider.of<ThemeProvider>(context);
     return MaterialApp(
+      supportedLocales: const[
+          Locale('en', 
+           ''), 
+           Locale('sw',''), 
+            
+      ],
+      localizationsDelegates: const[
+        
+          
+      ],
       theme: ThemeData.light(),
-      darkTheme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       themeMode: themeprovider.themeMode,
       debugShowCheckedModeBanner: false,
       initialRoute: '/home',

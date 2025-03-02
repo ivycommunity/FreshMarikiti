@@ -1,21 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/Widgets/pages/CheckoutPage.dart';
+import 'package:marikiti/Widgets/pages/Profile.dart';
+
 import 'package:marikiti/models/cartmodel.dart';
 import 'package:provider/provider.dart';
-
 
 class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    void navigatetoprofile() {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Profile()));
+    }
+
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Cart"),
-        backgroundColor: Colors.green[700],
+        actions: [
+          IconButton(
+              onPressed: () => navigatetoprofile(), icon: Icon(Icons.person)),
+        ],
+        title: Text("My Cart",style: TextStyle(
+          fontWeight: FontWeight.bold
+        ),),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back_ios)),
+        backgroundColor: Colors.white,
       ),
       body: cartProvider.cartItems.isEmpty
-          ? _buildEmptyCart() 
+          ? _buildEmptyCart()
           : Column(
               children: [
                 Expanded(
@@ -24,24 +41,32 @@ class CartPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = cartProvider.cartItems[index];
                       return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        color: Colors.lightGreen,
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundImage: AssetImage(item.image),
                           ),
                           title: Text(item.name),
-                          subtitle: Text("From: ${item.seller}\nKsh ${item.price}"),
+                          subtitle:
+                              Text("From: ${item.seller}\nKsh ${item.price}"),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.remove_circle_outline, color: Colors.red),
-                                onPressed: () => cartProvider.increaseItems(index),
+                                icon: Icon(Icons.remove_circle_outline,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    cartProvider.reduceItems(index),
                               ),
-                              Text("${item.quantity}", style: TextStyle(fontSize: 16)),
+                              Text("${item.quantity}",
+                                  style: TextStyle(fontSize: 16)),
                               IconButton(
-                                icon: Icon(Icons.add_circle_outline, color: Colors.green),
-                                onPressed: () => cartProvider.reduceItems(index),
+                                icon: Icon(Icons.add_circle_outline,
+                                    color: Colors.green),
+                                onPressed: () =>
+                                    cartProvider.increaseItems(index),
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, color: Colors.red),
@@ -54,7 +79,7 @@ class CartPage extends StatelessWidget {
                     },
                   ),
                 ),
-                _buildSummary(cartProvider),
+                _buildSummary(context, cartProvider),
               ],
             ),
     );
@@ -68,13 +93,16 @@ class CartPage extends StatelessWidget {
           Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
           SizedBox(height: 10),
           Text("No items currently in the cart",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey)),
         ],
       ),
     );
   }
 
-  Widget _buildSummary(CartProvider cartProvider) {
+  Widget _buildSummary(BuildContext context, cartProvider) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -92,14 +120,19 @@ class CartPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 40),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: cartProvider.cartItems.isEmpty
                 ? null
                 : () {
-                   // Navigator.push(context, MaterialPageRoute(builder: (context)))
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CheckoutPage()));
                   },
-            child: Text("PROCEED TO CHECKOUT", style: TextStyle(fontSize: 15,color: Colors.white)),
+            child: Text("PROCEED TO CHECKOUT",
+                style: TextStyle(fontSize: 15, color: Colors.white)),
           ),
           SizedBox(height: 5),
           Text(
@@ -118,7 +151,10 @@ class CartPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontSize: 16)),
-          Text(value, style: TextStyle(fontSize: 16, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
         ],
       ),
     );

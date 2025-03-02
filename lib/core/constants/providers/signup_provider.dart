@@ -21,7 +21,8 @@ class AuthProvider extends ChangeNotifier {
         return; // User canceled sign-in
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -45,5 +46,12 @@ class AuthProvider extends ChangeNotifier {
         SnackBar(content: Text("Error: ${e.toString()}")),
       );
     }
+  }
+
+  Future<void> logout() async {
+    await _googleSignIn.signOut();
+    await FirebaseAuth.instance.signOut();
+    
+    notifyListeners();
   }
 }
