@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marikiti/Widgets/pages/ChangePassword.dart';
+import 'package:marikiti/Widgets/pages/changepassword.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
