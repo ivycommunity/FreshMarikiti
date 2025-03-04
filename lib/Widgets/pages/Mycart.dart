@@ -19,16 +19,25 @@ class CartPage extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () => navigatetoprofile(), icon: Icon(Icons.person)),
+            onPressed: () => navigatetoprofile(),
+            icon: Icon(Icons.person),
+            color: Colors.black,
+          ),
         ],
-        title: Text("My Cart",style: TextStyle(
-          fontWeight: FontWeight.bold
-        ),),
+        title: Text(
+          "My Cart",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_ios)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios),
+          color: Colors.black,
+        ),
         backgroundColor: Colors.white,
       ),
       body: cartProvider.cartItems.isEmpty
@@ -61,7 +70,8 @@ class CartPage extends StatelessWidget {
                                     cartProvider.reduceItems(index),
                               ),
                               Text("${item.quantity}",
-                                  style: TextStyle(fontSize: 16)),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.black)),
                               IconButton(
                                 icon: Icon(Icons.add_circle_outline,
                                     color: Colors.green),
@@ -150,11 +160,15 @@ class CartPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 16)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          ),
           Text(value,
               style: TextStyle(
                   fontSize: 16,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                  color: Colors.black)),
         ],
       ),
     );
