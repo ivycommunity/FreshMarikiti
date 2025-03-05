@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:marikiti/Homepage.dart';
 import 'package:marikiti/core/constants/View/auth/signup.dart';
 import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Themeprovders.dart';
-import 'package:marikiti/core/constants/providers/google_sign_in_provider.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
 import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
 import 'package:marikiti/firebase_options.dart';
@@ -14,16 +14,20 @@ import 'package:provider/provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+   // Load environment variables
+  await dotenv.load(
+     fileName: ".env"
+  );
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
          
     );
+    
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create:(_)=>GoogleSignInProvider()),
-         ChangeNotifierProvider(create: (_)=>Passwordprovider()),
+              ChangeNotifierProvider(create: (_)=>Passwordprovider()),
          ChangeNotifierProvider(create: (_)=>ThemeProvider()),
          ChangeNotifierProvider(create: (_)=>CartProvider()), 
          ChangeNotifierProvider(create: (_)=>CheckoutProvider()),
@@ -54,9 +58,9 @@ class Marikiti extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: themeprovider.themeMode,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
-       // '/': (context) =>  SignUpScreen(),
+        '/': (context) =>  SignUpScreen(),
         '/home': (context) =>  HomePage(),
       },
     );

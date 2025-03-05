@@ -66,7 +66,7 @@ class OrderSuccessPage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Vendorsdetails())); // Back to the vendors page details
+                                    VendorsDetails())); // Back to the vendors page details
                       },
                       child: Text("Continue Shopping",
                           style: TextStyle(fontSize: 16, color: Colors.white)),

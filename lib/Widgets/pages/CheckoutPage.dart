@@ -3,7 +3,6 @@ import 'package:marikiti/Widgets/pages/Ordersuccess.dart';
 import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:provider/provider.dart';
 
-
 class CheckoutPage extends StatelessWidget {
   final List<String> paymentMethods = ["M-Pesa", "Cash on Delivery"];
 
@@ -13,14 +12,17 @@ class CheckoutPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-          leading: IconButton(
+        leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back_ios)),
-        title: Text("Checkout",style: TextStyle(
-          color: Colors.white,
-        ),),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white,)),
+        title: Text(
+          "Checkout",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: Colors.green[700],
         centerTitle: true,
       ),
@@ -31,31 +33,29 @@ class CheckoutPage extends StatelessWidget {
           children: [
             _buildSectionTitle("DELIVERY ADDRESS"),
             Text("Siwaka Estate - Madarka", style: TextStyle(fontSize: 16)),
-
             SizedBox(height: 10),
             _buildSectionTitle("TYPE OF SUBSCRIPTION"),
             Text("Weekly", style: TextStyle(fontSize: 16)),
-
             SizedBox(height: 10),
             _buildSectionTitle("TIME OF DELIVERY"),
             Text("Wednesday 6:00 PM", style: TextStyle(fontSize: 16)),
-
             SizedBox(height: 10),
             TextButton(
               onPressed: () {
-                // Navigate to Subscription Page 
+                // Navigate to Subscription Page
               },
               child: Text(
                 "Change in the subscription page",
-                style: TextStyle(color: Colors.blue, decoration:TextDecoration.none ),
+                style: TextStyle(
+                    color: Colors.blue, decoration: TextDecoration.none),
               ),
             ),
-
             SizedBox(height: 15),
             _buildSectionTitle("PAYMENT METHOD"),
-            
             DropdownButtonFormField<String>(
-              value: checkoutProvider.selectedPaymentMethod.isNotEmpty ? checkoutProvider.selectedPaymentMethod : null,
+              value: checkoutProvider.selectedPaymentMethod.isNotEmpty
+                  ? checkoutProvider.selectedPaymentMethod
+                  : null,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 filled: true,
@@ -70,7 +70,6 @@ class CheckoutPage extends StatelessWidget {
                 checkoutProvider.setPaymentMethod(value!);
               },
             ),
-
             SizedBox(height: 15),
             Row(
               children: [
@@ -81,19 +80,28 @@ class CheckoutPage extends StatelessWidget {
                 ),
               ],
             ),
-
             Spacer(),
-
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
                 minimumSize: Size(double.infinity, 50),
               ),
               onPressed: checkoutProvider.isPaymentSelected
                   ? () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>OrderSuccessPage()));
+                     /* if (checkoutProvider.selectedPaymentMethod == "M-Pesa") {
+                        checkoutProvider.initiateMpesaPayment(context);
+                      }*/
+                    
+   Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OrderSuccessPage()));
+
+                      
+                   
                     }
                   : null,
               child: Text(

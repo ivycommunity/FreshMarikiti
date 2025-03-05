@@ -22,6 +22,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
   @override
   Widget build(BuildContext context) {
     final themeprovider = Provider.of<ThemeProvider>(context);
+   final authprovider = Provider.of<AuthProvider>(context);
 
     //final googleprovider = Provider.of<AuthProvider>(context);
     return SizedBox(
@@ -63,18 +64,13 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
                 text: "Support",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Support()))),
-            /* drawerItem(
-                icon: Icons.logout_outlined,
-                text: "Log Out",
-                onTap: () {
-                  googleprovider.Logout();
-                }), */
 
             drawerItem(
                 icon: Icons.settings,
                 text: "Settings",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Settings()))),
+              
             ListTile(
               leading: const Icon(
                 Icons.dark_mode,

@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:marikiti/core/constants/providers/google_sign_in_provider.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
+import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
 import 'package:provider/provider.dart';
 
-Widget buildTextField(String hintText, IconData icon,
-    {bool obscureText = false}) {
-  return TextField(
+Widget buildTextField(
+  String hintText,
+  IconData icon, {
+  bool obscureText = false,
+  required TextEditingController controller, // Fixed error
+}) {
+  return TextFormField(
+    controller: controller, // Added controller
     obscureText: obscureText,
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return "Please enter your $hintText";
+      }
+      return null;
+    },
     decoration: InputDecoration(
       hintText: hintText,
       prefixIcon: Icon(icon, color: Colors.green[700]),
@@ -14,7 +25,7 @@ Widget buildTextField(String hintText, IconData icon,
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: Colors.green, width: 2),
+        borderSide: const BorderSide(color: Colors.green, width: 2),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -25,11 +36,20 @@ Widget buildTextField(String hintText, IconData icon,
 }
 
 // Password Field
-Widget passwordField(BuildContext context) {
+Widget passwordField(BuildContext context, TextEditingController controller) {
   return Consumer<Passwordprovider>(
     builder: (context, passwordProvider, child) {
-      return TextField(
+      return TextFormField(
+        controller: controller,
         obscureText: passwordProvider.ispasswordvisisble,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "Please enter your password";
+          } else if (value.length < 6) {
+            return "Password must be at least 6 characters";
+          }
+          return null;
+        },
         decoration: InputDecoration(
           hintText: "Password",
           prefixIcon: Icon(Icons.lock, color: Colors.green[700]),
@@ -48,7 +68,7 @@ Widget passwordField(BuildContext context) {
           fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.green, width: 2),
+            borderSide: const BorderSide(color: Colors.green, width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
@@ -59,6 +79,7 @@ Widget passwordField(BuildContext context) {
     },
   );
 }
+
 Widget googleSignInButton(BuildContext context) {
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
@@ -69,13 +90,14 @@ Widget googleSignInButton(BuildContext context) {
       padding: EdgeInsets.symmetric(vertical: 13, horizontal: 10),
     ),
     onPressed: () {
-      final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
-      provider.googleLogin();
+      final provider = Provider.of<AuthProvider>(context, listen: false);
+      provider.signInWithGoogle(context);
     },
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset("assets/Google.png", height: 24), // Add a Google logo in assets
+        Image.asset("assets/Google.png",
+            height: 24), // Add a Google logo in assets
         SizedBox(width: 10),
         Text(
           "Sign in with Google",

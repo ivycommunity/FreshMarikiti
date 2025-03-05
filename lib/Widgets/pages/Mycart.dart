@@ -50,7 +50,7 @@ class CartPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = cartProvider.cartItems[index];
                       return Card(
-                        color: Colors.lightGreen,
+                        color: Colors.green,
                         margin:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         child: ListTile(
