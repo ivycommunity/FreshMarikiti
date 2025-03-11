@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/Widgets/Widgets.dart';
 import 'package:marikiti/core/constants/View/auth/login.dart';
-import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
+import 'package:marikiti/core/constants/providers/signup_provider.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {

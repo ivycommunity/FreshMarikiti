@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/drawer.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -12,22 +13,24 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back_ios)),
-          title: Text('Profile'),
-          centerTitle: true,
+        title: Text('Personal Details '),
+        leading: Builder(builder: (context)=>IconButton(onPressed: (){
+            Scaffold.of(context).openDrawer();
+        }, icon: Icon(Icons.menu, color: Colors.white,))),
+         actions: [
+             IconButton(onPressed: (){}, icon: Icon(Icons.)), 
+             
+         ],),
 
-      ),
-      body: Column(
-         children: [  
-           ListTile(
-              
-           )
-         ],
-      ),
+      
+      drawer:FreshMarikitiDrawer(),
+      body: SingleChildScrollView(
+          child: Column(
+                children: [
+                     
+                ],
+          ),
+      )
     );
   }
 }

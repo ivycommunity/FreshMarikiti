@@ -3,7 +3,7 @@ import 'package:marikiti/Homepage.dart';
 import 'package:marikiti/Widgets/Widgets.dart';
 import 'package:marikiti/core/constants/View/auth/signup.dart';
 import 'package:marikiti/core/constants/providers/Themeprovders.dart';
-import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
+import 'package:marikiti/core/constants/providers/signup_provider.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -31,11 +31,7 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //to be replaced with the FreshMarikiti Logo
-                    const Icon(
-                      Icons.shopping_basket,
-                      size: 100,
-                      color: Colors.green,
-                    ),
+              Image.asset('assets/frehs-marikiti.png'),
                     const Text(
                       "Fresh Marikiti",
                       style: TextStyle(

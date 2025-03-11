@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
-import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
+import 'package:marikiti/core/constants/providers/signup_provider.dart';
 import 'package:provider/provider.dart';
 
 Widget buildTextField(

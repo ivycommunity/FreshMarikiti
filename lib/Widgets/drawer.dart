@@ -22,7 +22,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
   @override
   Widget build(BuildContext context) {
     final themeprovider = Provider.of<ThemeProvider>(context);
-   final authprovider = Provider.of<AuthProvider>(context);
+   //final authprovider = Provider.of<AuthProvider>(context);
 
     //final googleprovider = Provider.of<AuthProvider>(context);
     return SizedBox(

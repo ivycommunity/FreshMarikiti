@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:marikiti/Homepage.dart';
 import 'package:marikiti/core/constants/View/auth/signup.dart';
+import 'package:marikiti/core/constants/View/auth/user_page.dart';
 import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Themeprovders.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
-import 'package:marikiti/core/constants/providers/signup_%7F%7Fprovider.dart';
+import 'package:marikiti/core/constants/providers/signup_provider.dart';
 import 'package:marikiti/firebase_options.dart';
 import 'package:marikiti/models/cartmodel.dart';
 
