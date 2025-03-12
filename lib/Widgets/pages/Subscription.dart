@@ -209,20 +209,26 @@ class _SubscriptionState extends State<Subscription> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(0),
+                height: 28,
+                alignment: Alignment.center,
+                padding: EdgeInsets.zero,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(20)),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: Icon(Icons.remove, color: Colors.black),
+                      padding: EdgeInsets.zero,
                       onPressed: () => provider.reduceItems(index),
                     ),
                     Text("${item.quantity}",
                         style: TextStyle(color: Colors.black)),
                     IconButton(
                         icon: Icon(Icons.add, color: Colors.black),
+                        padding: EdgeInsets.zero,
                         onPressed: () => provider.increaseItems(index))
                   ],
                 ),
