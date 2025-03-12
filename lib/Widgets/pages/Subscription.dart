@@ -14,7 +14,7 @@ class _SubscriptionState extends State<Subscription> {
   final TextEditingController emailController =
       TextEditingController(text: "annwanjiku@example.com");
   final TextEditingController addressController =
-      TextEditingController(text: "Siwaka Estate-Makadara");
+      TextEditingController(text: "Siwaka Estate -Makadara");
   final TextEditingController subscriptionController =
       TextEditingController(text: "Weekly");
   final TextEditingController timeController =
@@ -69,6 +69,18 @@ class _SubscriptionState extends State<Subscription> {
                   buildEditableField("Time of Delivery", timeController)
                 ],
               )),
+          Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 5,
+                      spreadRadius: 2,
+                    ),
+                  ]))
         ],
       ),
     );
