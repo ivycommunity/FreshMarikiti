@@ -63,7 +63,7 @@ class Marikiti extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: themeprovider.themeMode,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
         '/': (context) => SignUpScreen(),
         '/home': (context) => HomePage(),
