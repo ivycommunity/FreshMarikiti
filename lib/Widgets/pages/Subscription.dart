@@ -1,104 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/Widgets.dart';
+import 'package:marikiti/core/constants/providers/Subscriptionprovider.dart';
+import 'package:provider/provider.dart';
 import 'package:marikiti/Widgets/drawer.dart';
+import 'package:marikiti/Widgets/pages/Mycart.dart';
+import 'package:marikiti/core/constants/appcolors.dart';
 
-class Subscription extends StatefulWidget {
-  const Subscription({super.key});
 
-  @override
-  State<Subscription> createState() => _SubscriptionState();
-}
-
-class _SubscriptionState extends State<Subscription> {
-  final TextEditingController nameController =
-      TextEditingController(text: "Ann Wanjiku");
-  final TextEditingController emailController =
-      TextEditingController(text: "annwanjiku@example.com");
-  final TextEditingController addressController =
-      TextEditingController(text: "Siwaka Estate-Makadara");
-  final TextEditingController subscriptionController =
-      TextEditingController(text: "Weekly");
-  final TextEditingController timeController =
-      TextEditingController(text: " Wednesday 6:00pm");
+class SubscriptionPage extends StatelessWidget {
+  const SubscriptionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<Subscriptionprovider>(context);
+
     return Scaffold(
+      backgroundColor: lightyellow,
       appBar: AppBar(
-        backgroundColor: Colors.green,
-        elevation: 0,
-        leading: Builder(
-            builder: (context) => IconButton(
-                icon: Icon(Icons.menu, color: Colors.black),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer;
-                })),
-        title: const Text("ANN'S SUBSCRIPTION"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>  CartPage()),
+              );
+            },
+            icon: const CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.shopping_cart, color: Colors.black),
+            ),
+          ),
+        ],
+        title: const Text('Subscription'),
         centerTitle: true,
-        actions: [],
+        backgroundColor: Colors.green[700],
+        automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: const Icon(Icons.menu, color: Colors.white),
+          ),
+        ),
       ),
-      drawer: FreshMarikitiDrawer(),
-      body: Column(
-        children: [
-          Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 5,
-                    spreadRadius: 2,
+      drawer: const FreshMarikitiDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "PERSONAL DETAILS",
+                    
+                    style: TextStyle(
+                    
+                      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
                   ),
+                  const SizedBox(height: 10),
+          
+                  
+                  EditableField(label: "Name", hintText: "Ann Wanjiku", controller: provider.nameController),
+                  EditableField(label: "E-mail", hintText: "annwanjiku@example.com", controller: provider.emailController),
+                  EditableField(label: "Delivery Address", hintText: "Enter your address", controller: provider.addressController, isSaveButton: true),
+                  EditableField(label: "Type of Subscription", hintText: "Weekly", controller: provider.subscriptionTypeController),
+                  EditableField(label: "Delivery Time", hintText: "Wednesday 6:00pm", controller: provider.deliveryTimeController),
                 ],
               ),
-              child: Column(
-                children: [
-                  const Text("PERSONAL DETAILS",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  SizedBox(height: 10),
-                  buildEditableField("Name", nameController),
-                  buildEditableField("E-mail", emailController),
-                  buildEditableField("Delivery Address", addressController),
-                  buildEditableField(
-                      "Type of Subscription", subscriptionController),
-                  buildEditableField("Time of Delivery", timeController)
-                ],
-              )),
-        ],
+            ),
+          ),
+        ),
       ),
     );
-  }
-
-  Widget buildEditableField(String label, TextEditingController controller,
-      {bool isSave = false}) {
-    return Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(children: [
-          Expanded(
-            child: TextField(
-                style: TextStyle(color: Colors.grey),
-                controller: controller,
-                decoration: InputDecoration(
-                    labelText: label, border: OutlineInputBorder())),
-          ),
-          SizedBox(width: 10),
-          ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(40, 55),
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-              child:
-                  Text("EDIT", style: TextStyle(fontWeight: FontWeight.bold)))
-        ]));
   }
 }

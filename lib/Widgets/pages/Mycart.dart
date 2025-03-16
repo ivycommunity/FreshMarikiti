@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/pages/Additems.page.dart';
 import 'package:marikiti/Widgets/pages/CheckoutPage.dart';
 import 'package:marikiti/Widgets/pages/Profile.dart';
 
@@ -41,7 +42,7 @@ class CartPage extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: cartProvider.cartItems.isEmpty
-          ? _buildEmptyCart()
+          ? _buildEmptyCart(context)
           : Column(
               children: [
                 Expanded(
@@ -95,22 +96,40 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyCart() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
-          SizedBox(height: 10),
-          Text("No items currently in the cart",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey)),
-        ],
-      ),
-    );
-  }
+ Widget _buildEmptyCart(BuildContext context) {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
+        SizedBox(height: 10),
+        Text(
+          "No items currently in the cart",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
+        SizedBox(height: 20),
+
+        // Add Item Button
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddEditItemPage(isEditMode: false)),
+            );
+          },
+          icon: Icon(Icons.add, color: Colors.white),
+          label: Text("Add an Item", style: TextStyle(color: Colors.white, fontSize: 16)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green[700],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _buildSummary(BuildContext context, cartProvider) {
     return Container(

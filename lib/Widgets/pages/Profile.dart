@@ -18,7 +18,7 @@ class _ProfileState extends State<Profile> {
             Scaffold.of(context).openDrawer();
         }, icon: Icon(Icons.menu, color: Colors.white,))),
          actions: [
-             IconButton(onPressed: (){}, icon: Icon(Icons.)), 
+             IconButton(onPressed: (){}, icon: Icon(Icons.menu),), 
              
          ],),
 

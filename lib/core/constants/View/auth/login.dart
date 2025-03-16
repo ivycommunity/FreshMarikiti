@@ -31,7 +31,7 @@ class LoginScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //to be replaced with the FreshMarikiti Logo
-              Image.asset('assets/frehs-marikiti.png'),
+             // Image.asset('assets/frehs-marikiti.png'),
                     const Text(
                       "Fresh Marikiti",
                       style: TextStyle(
@@ -46,9 +46,7 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     // Login Button
-                    authProvider.isLoading
-                        ? const CircularProgressIndicator()
-                        : SizedBox(
+                  SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(

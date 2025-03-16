@@ -121,25 +121,92 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> login(
-      String email, String password, BuildContext context) async {
-    try {
-      _isLoading = true;
+Future<String?> login(String email, String password, BuildContext context) async {
+  try {
+    _isLoading = true;
+    notifyListeners();
 
-      notifyListeners();
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      _user = userCredential.user;
-      _isLoading = false;
-      notifyListeners();
-      Navigator.pushReplacementNamed(context, '/home');
-      return null; // after success
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      return "Failed to login ${e.toString()}";
+    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    _user = userCredential.user;
+    _isLoading = false;
+    notifyListeners();
+
+    // Show full-screen loading before navigating
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    // Wait for 2 seconds before navigating
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Close the loading dialog
+    Navigator.of(context, rootNavigator: true).pop();
+
+    // Navigate to Home Screen
+    Navigator.pushReplacementNamed(context, '/home');
+
+    return null; // Success
+  } on FirebaseAuthException catch (e) {
+    _isLoading = false;
+    notifyListeners();
+
+    String errorMessage;
+    if (e.code == 'user-not-found') {
+      errorMessage = "No user found for this email.";
+    } else if (e.code == 'wrong-password') {
+      errorMessage = "Incorrect password. Please try again.";
+    } else {
+      errorMessage = "Login failed: ${e.message}";
     }
+
+    // ✅ Show an alert dialog for errors
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Login Failed "),
+        content: Text(errorMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+
+    return errorMessage;
+  } catch (e) {
+    _isLoading = false;
+    notifyListeners();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Unexpected Error"),
+        content: Text("Something went wrong!!"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+
+    return "Unexpected error: ${e.toString()}";
   }
+}
+
 
   // **Logout**
   Future<void> logout() async {

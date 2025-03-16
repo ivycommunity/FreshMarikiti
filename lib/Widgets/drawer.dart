@@ -42,7 +42,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
                 icon: Icons.subscriptions,
                 text: "Subscription",
                 onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Subscription()))),
+                    MaterialPageRoute(builder: (context) => SubscriptionPage()))),
             drawerItem(
                 icon: Icons.shopping_cart,
                 text: "My Cart",
