@@ -12,7 +12,8 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => CartPage()));
             },
             icon: CircleAvatar(
               backgroundColor: Colors.white,
@@ -39,50 +40,86 @@ class HomePage extends StatelessWidget {
       drawer: FreshMarikitiDrawer(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-        // Categories for the Fruits, veggies and dairy products 
-        // Categories for the vendors list 
-        // offers  
-
-              SizedBox(height: 20),
-
-         
-
-              SizedBox(height: 20),
-
-              // Offers Section
-              sectionTitle('Offers', () {}),
-              SizedBox(
-                height: 120,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: offers.length,
-                  itemBuilder: (context, index) {
-                    return offerCard(offers[index]);
-                  },
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Category section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    categoryItem('Fruits', 'assets/fruits.png'),
+                    categoryItem("Vegies", 'assets/vegetables.png'),
+                    categoryItem("Dairy Products", 'assets/dairy.png')
+                  ],
                 ),
-              ),
 
-              SizedBox(height: 20),
+                SizedBox(height: 10),
 
-              // Customer Reviews
-             // customerReviews(),
-            ],
-          ),
-        ),
+                Column(
+                  children: [
+                    sectionTitle(
+                      "Vendors List", /*ontap*/
+                    ),
+                    SizedBox(height: 5),
+                    // Vendor section
+                    SizedBox(
+                      height: 150,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: vendors
+                            .map((vendor) => vendorCard(vendor))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+
+                // Offers section
+                Column(children: [
+                  sectionTitle(
+                    "Offers", /*ontap*/
+                  ),
+                  SizedBox(height: 5),
+                  SizedBox(
+                      height: 170,
+                      child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children:
+                              offers.map((offer) => offerCard(offer)).toList()))
+                ]),
+
+                SizedBox(height: 10),
+
+                //Customer Reviews section
+                Column(
+                  children: [
+                    customerReviews(),
+                  ],
+                )
+              ],
+            )),
       ),
     );
   }
 
-  Widget sectionTitle(String title, VoidCallback onTap) {
+  Widget sectionTitle(
+    String title,
+    /*VoidCallback onTap*/
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        TextButton(onPressed: onTap, child: Text('See All'))
+        Text(title,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        TextButton(
+            onPressed: () {},
+            child: Text(
+              'See All',
+              style: TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+            ))
       ],
     );
   }
@@ -116,15 +153,21 @@ class HomePage extends StatelessWidget {
           children: [
             Image.asset(vendor['image']!, height: 80, fit: BoxFit.cover),
             SizedBox(height: 5),
-            Text(vendor['name']!, style: TextStyle(fontWeight: FontWeight.bold)),
-            ElevatedButton(onPressed: () {}, child: Text('View'))
+            Text(vendor['name']!,
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              vendor['description']!,
+              style: TextStyle(fontSize: 12),
+            ),
+            ElevatedButton(
+                onPressed: () {}, child: Text('View ${vendor['name']}'))
           ],
         ),
       ),
     );
   }
 
-  Widget offerCard(Map<String, String> offer) {
+  Widget offerCard(Map<String, dynamic> offer) {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
@@ -138,9 +181,18 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(offer['title']!, style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 5),
-              Text(offer['description']!, style: TextStyle(fontSize: 12)),
+              // Image.asset(offer['image'], height: 50, fit: BoxFit.cover),
+              Text(offer['title'],
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                offer['speech'],
+                style: TextStyle(),
+              ),
+              Text(offer['description'], style: TextStyle()),
+              // Text(
+              //   offer['stallNo'],
+              //   style: TextStyle(),
+              // ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(onPressed: () {}, child: Text('View')),
@@ -164,7 +216,8 @@ class HomePage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text('4.0', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('4.0',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               SizedBox(width: 10),
               Icon(Icons.star, color: Colors.yellow[700]),
               Icon(Icons.star, color: Colors.yellow[700]),
@@ -176,7 +229,8 @@ class HomePage extends StatelessWidget {
           SizedBox(height: 5),
           Text('Based on 300 reviews'),
           SizedBox(height: 5),
-          Text('Mevis Katumi - Customer', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Mevis Katumi - Customer',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -191,12 +245,51 @@ final List<Map<String, String>> categories = [
 ];
 
 final List<Map<String, String>> vendors = [
-  {'name': 'Hassan Abdi', 'image': 'assets/vendor1.png'},
-  {'name': 'Maria Halima', 'image': 'assets/vendor2.png'},
-  {'name': 'Susan Kamau', 'image': 'assets/vendor3.png'},
+  {
+    'name': 'Hassan Abdi',
+    'description': 'Welcome customer, everyone says how my bananas are sweet',
+    'image': 'assets/vendor1.png'
+  },
+  {
+    'name': 'Maria Halima',
+    'description': 'Habari mimi ni muuza samaki',
+    'image': 'assets/vendor2.png'
+  },
+  {
+    'name': 'Susan Kamau',
+    'description': 'Hello customer, welcome to my stand',
+    'image': 'assets/vendor3.png'
+  },
 ];
 
-final List<Map<String, String>> offers = [
-  {'title': "It's Mango Season!", 'description': 'Get 1.5 kgs, smooth & juicy...', 'image': 'assets/mango.png'},
- // {'title': "Coconuts from Mombasa", 'description': 'Fresh & sweet coconuts...', 'image': 'assets/coconut.png'},
+final List<Map<String, dynamic>> offers = [
+  {
+    'title': "It's Mango Season!",
+    'speech': 'Mama Salama says',
+    'description': 'Get a 30% discount for every 10 mangoes you buy',
+    'stallNo': 20,
+    'image': 'assets/mango.png'
+  },
+  {
+    'title': "Coconuts from Mombasa!",
+    'speech': 'Hassan says',
+    'description': 'For every 5 coconuts you buy get 1 free...',
+    'stallNo': 104,
+    'image': 'assets/coconut.png'
+  },
+  {
+    'title': 'Potatoes perfect for fries!',
+    'speech': 'Mr Kinyanjui says',
+    'description':
+        'Get a bag of fresh potatoes from Nyandarua at a 10% discount per kg. Hurry while stocks last!',
+    'stallNo': 003,
+    'image': 'assets/potatoes.png'
+  },
+  {
+    'title': 'Get the best fish in the market!',
+    'speech': 'Mrs Onyango says',
+    'description': 'Get the best fish in the market at a fair price!',
+    'stallNo': 403,
+    'image': 'assets/fish.png'
+  }
 ];
