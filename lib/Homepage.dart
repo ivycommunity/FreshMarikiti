@@ -44,6 +44,7 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Category section
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -55,22 +56,48 @@ class HomePage extends StatelessWidget {
 
                 SizedBox(height: 10),
 
-                sectionTitle(
-                  "Vendors List", /*ontap*/
+                Column(
+                  children: [
+                    sectionTitle(
+                      "Vendors List", /*ontap*/
+                    ),
+                    SizedBox(height: 5),
+                    // Vendor section
+                    SizedBox(
+                      height: 150,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: vendors
+                            .map((vendor) => vendorCard(vendor))
+                            .toList(),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 5),
-                SizedBox(
-                  height: 150,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children:
-                        vendors.map((vendor) => vendorCard(vendor)).toList(),
+                SizedBox(height: 10),
+
+                // Offers section
+                Column(children: [
+                  sectionTitle(
+                    "Offers", /*ontap*/
                   ),
-                ),
-                // Expanded(child: ListView(
-                //   scrollDirection: Axis.horizontal,
-                //   children: offers.map((offer) => offerCard(offer)).toList()
-                // ))
+                  SizedBox(height: 5),
+                  SizedBox(
+                      height: 170,
+                      child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children:
+                              offers.map((offer) => offerCard(offer)).toList()))
+                ]),
+
+                SizedBox(height: 10),
+
+                //Customer Reviews section
+                Column(
+                  children: [
+                    customerReviews(),
+                  ],
+                )
               ],
             )),
       ),
@@ -140,7 +167,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget offerCard(Map<String, String> offer) {
+  Widget offerCard(Map<String, dynamic> offer) {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
@@ -154,10 +181,18 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(offer['title']!,
+              // Image.asset(offer['image'], height: 50, fit: BoxFit.cover),
+              Text(offer['title'],
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 5),
-              Text(offer['description']!, style: TextStyle(fontSize: 12)),
+              Text(
+                offer['speech'],
+                style: TextStyle(),
+              ),
+              Text(offer['description'], style: TextStyle()),
+              // Text(
+              //   offer['stallNo'],
+              //   style: TextStyle(),
+              // ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: ElevatedButton(onPressed: () {}, child: Text('View')),
