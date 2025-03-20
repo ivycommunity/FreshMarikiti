@@ -152,7 +152,6 @@ class _HomePageState extends State<HomePage> {
         width: 135,
         height: 200,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.blue, width: 2.0),
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
         ),
@@ -161,34 +160,44 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
                 width: 135,
                 height: 110,
-                child: Image.asset(vendor['image']!, fit: BoxFit.cover)),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                    child: Image.asset(vendor['image']!, fit: BoxFit.cover))),
             SizedBox(height: 5),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(vendor['name']!,
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(
-                  vendor['description']!,
-                  style: TextStyle(
-                    fontSize: 11,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(vendor['name']!,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    vendor['description']!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 11,
+                    ),
                   ),
-                ),
-                SizedBox(
-                    height: 30,
-                    child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'View ${vendor['name']}',
-                          style: TextStyle(fontSize: 10),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.red[300],
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8))))
-              ],
+                  Spacer(),
+                  SizedBox(
+                      height: 30,
+                      child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text(
+                            'View ${vendor['name']}',
+                            style: TextStyle(fontSize: 10),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.red[300],
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8)))),
+                  SizedBox(height: 10)
+                ],
+              ),
             )
           ],
         ),
@@ -254,12 +263,18 @@ class _HomePageState extends State<HomePage> {
                                   foregroundColor: Colors.black,
                                   backgroundColor: Colors.white,
                                 )),
-                          ))
+                          )),
                     ],
                   ),
                 ),
               ),
-              Image.asset(offer['image']!, fit: BoxFit.cover),
+              ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  child: Image.asset(offer['image']!,
+                      width: 100, fit: BoxFit.cover)),
             ],
           ),
         ),
@@ -310,7 +325,8 @@ final List<Map<String, String>> vendors = [
   },
   {
     'name': 'Maria Halima',
-    'description': 'Habari mimi ni muuza samaki',
+    'description':
+        'Habari mimi ni muuza samaki hodari. Wanunuzi wangu hufurahi',
     'image': 'assets/vendor2.jpeg'
   },
   {
