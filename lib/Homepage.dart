@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:marikiti/Widgets/drawer.dart';
 import 'package:marikiti/Widgets/pages/Mycart.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,9 +53,9 @@ class HomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    categoryItem('Fruits', 'assets/fruits.png'),
-                    categoryItem("Vegies", 'assets/vegetables.png'),
-                    categoryItem("Dairy Products", 'assets/dairy.png')
+                    categoryItem('Fruits', 'assets/fruits.jpg'),
+                    categoryItem("Vegies", 'assets/vegetables.jpg'),
+                    categoryItem("Dairy Products", 'assets/dairy.jpg')
                   ],
                 ),
 
@@ -64,7 +69,7 @@ class HomePage extends StatelessWidget {
                     SizedBox(height: 5),
                     // Vendor section
                     SizedBox(
-                      height: 150,
+                      height: 220,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: vendors
@@ -83,7 +88,7 @@ class HomePage extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   SizedBox(
-                      height: 170,
+                      height: 150,
                       child: ListView(
                           scrollDirection: Axis.horizontal,
                           children:
@@ -144,59 +149,117 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
-        width: 120,
+        width: 135,
+        height: 200,
         decoration: BoxDecoration(
+          border: Border.all(color: Colors.blue, width: 2.0),
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
         ),
         child: Column(
           children: [
-            Image.asset(vendor['image']!, height: 80, fit: BoxFit.cover),
+            SizedBox(
+                width: 135,
+                height: 110,
+                child: Image.asset(vendor['image']!, fit: BoxFit.cover)),
             SizedBox(height: 5),
-            Text(vendor['name']!,
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(
-              vendor['description']!,
-              style: TextStyle(fontSize: 12),
-            ),
-            ElevatedButton(
-                onPressed: () {}, child: Text('View ${vendor['name']}'))
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(vendor['name']!,
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  vendor['description']!,
+                  style: TextStyle(
+                    fontSize: 11,
+                  ),
+                ),
+                SizedBox(
+                    height: 30,
+                    child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text(
+                          'View ${vendor['name']}',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.red[300],
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8))))
+              ],
+            )
           ],
         ),
       ),
     );
   }
 
-  Widget offerCard(Map<String, dynamic> offer) {
+  Widget offerCard(Map<String, String> offer) {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
-        width: 150,
         decoration: BoxDecoration(
           color: Colors.orange[100],
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              // Image.asset(offer['image'], height: 50, fit: BoxFit.cover),
-              Text(offer['title'],
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(
-                offer['speech'],
-                style: TextStyle(),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Container(
+                  width: 160,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(offer['title']!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.white)),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        offer['speech']!,
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Flexible(
+                          child: Text(offer['description']!,
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.white))),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        offer['stallNo']!,
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                          height: 22,
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: Text('View Offer'),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: Colors.white,
+                                )),
+                          ))
+                    ],
+                  ),
+                ),
               ),
-              Text(offer['description'], style: TextStyle()),
-              // Text(
-              //   offer['stallNo'],
-              //   style: TextStyle(),
-              // ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: ElevatedButton(onPressed: () {}, child: Text('View')),
-              ),
+              Image.asset(offer['image']!, fit: BoxFit.cover),
             ],
           ),
         ),
@@ -238,58 +301,53 @@ class HomePage extends StatelessWidget {
 }
 
 // Sanple data
-final List<Map<String, String>> categories = [
-  {'name': 'Fruits', 'image': 'assets/fruits.png'},
-  {'name': 'Veggies', 'image': 'assets/veggies.png'},
-  {'name': 'Dairy', 'image': 'assets/dairy.png'},
-];
 
 final List<Map<String, String>> vendors = [
   {
     'name': 'Hassan Abdi',
     'description': 'Welcome customer, everyone says how my bananas are sweet',
-    'image': 'assets/vendor1.png'
+    'image': 'assets/vendor1.jpeg'
   },
   {
     'name': 'Maria Halima',
     'description': 'Habari mimi ni muuza samaki',
-    'image': 'assets/vendor2.png'
+    'image': 'assets/vendor2.jpeg'
   },
   {
     'name': 'Susan Kamau',
     'description': 'Hello customer, welcome to my stand',
-    'image': 'assets/vendor3.png'
+    'image': 'assets/vendor3.jpeg'
   },
 ];
 
-final List<Map<String, dynamic>> offers = [
+final List<Map<String, String>> offers = [
   {
     'title': "It's Mango Season!",
     'speech': 'Mama Salama says',
     'description': 'Get a 30% discount for every 10 mangoes you buy',
-    'stallNo': 20,
-    'image': 'assets/mango.png'
+    'stallNo': 'Stall No 20',
+    'image': 'assets/mangoes.jpeg'
   },
   {
     'title': "Coconuts from Mombasa!",
     'speech': 'Hassan says',
     'description': 'For every 5 coconuts you buy get 1 free...',
-    'stallNo': 104,
-    'image': 'assets/coconut.png'
+    'stallNo': 'Stall No 104',
+    'image': 'assets/coconuts.jpeg'
   },
   {
     'title': 'Potatoes perfect for fries!',
     'speech': 'Mr Kinyanjui says',
     'description':
         'Get a bag of fresh potatoes from Nyandarua at a 10% discount per kg. Hurry while stocks last!',
-    'stallNo': 003,
-    'image': 'assets/potatoes.png'
+    'stallNo': 'Stall No 003',
+    'image': 'assets/potatoes.jpeg'
   },
   {
     'title': 'Get the best fish in the market!',
     'speech': 'Mrs Onyango says',
     'description': 'Get the best fish in the market at a fair price!',
-    'stallNo': 403,
-    'image': 'assets/fish.png'
+    'stallNo': 'Stall No 403',
+    'image': 'assets/fish.jpg'
   }
 ];
