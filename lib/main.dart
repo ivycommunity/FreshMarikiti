@@ -9,6 +9,7 @@ import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Subscriptionprovider.dart';
 import 'package:marikiti/core/constants/providers/Themeprovders.dart';
 import 'package:marikiti/core/constants/providers/itemprovider.dart';
+import 'package:marikiti/core/constants/providers/orderprovider.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
 import 'package:marikiti/core/constants/providers/signup_provider.dart';
 import 'package:marikiti/firebase_options.dart';
@@ -36,8 +37,11 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
-        ChangeNotifierProvider(create: (_)=>Subscriptionprovider()),
-        ChangeNotifierProvider(create: (_)=>ItemProvider(),),
+        ChangeNotifierProvider(create: (_) => Subscriptionprovider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ItemProvider(),
+        ),
       ],
       child: const Marikiti(),
     ),
@@ -63,7 +67,7 @@ class Marikiti extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: themeprovider.themeMode,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
         '/': (context) => SignUpScreen(),
         '/home': (context) => HomePage(),
