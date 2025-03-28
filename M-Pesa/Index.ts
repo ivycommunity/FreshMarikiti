@@ -146,4 +146,5 @@ Server.listen(process.env.PORT || 3000, () => {
 process.on("uncaughtException", (error) => {
   console.log(error.message);
   console.log(error.stack);
+  process.exit(1);
 });
