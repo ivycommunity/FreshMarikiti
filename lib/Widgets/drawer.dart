@@ -22,7 +22,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
   @override
   Widget build(BuildContext context) {
     final themeprovider = Provider.of<ThemeProvider>(context);
-   //final authprovider = Provider.of<AuthProvider>(context);
+    //final authprovider = Provider.of<AuthProvider>(context);
 
     //final googleprovider = Provider.of<AuthProvider>(context);
     return SizedBox(
@@ -41,8 +41,10 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
             drawerItem(
                 icon: Icons.subscriptions,
                 text: "Subscription",
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SubscriptionPage()))),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SubscriptionPage()))),
             drawerItem(
                 icon: Icons.shopping_cart,
                 text: "My Cart",
@@ -52,7 +54,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
                 icon: Icons.person,
                 text: "Profile",
                 onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Profile()))),
+                    MaterialPageRoute(builder: (context) => ProfilePage()))),
             drawerItem(
                 icon: Icons.info,
                 text: "About Us",
@@ -64,13 +66,11 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
                 text: "Support",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Support()))),
-
             drawerItem(
                 icon: Icons.settings,
                 text: "Settings",
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Settings()))),
-              
             ListTile(
               leading: const Icon(
                 Icons.dark_mode,

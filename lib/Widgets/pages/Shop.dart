@@ -100,39 +100,55 @@ class ProductList extends StatelessWidget {
     final products =
         Provider.of<OrderProvider>(context).getProductsByCategory(category);
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        final product = products[index];
-        return Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: ListTile(
-            leading: Image.asset(product.image, width: 50, height: 50),
-            title: Text(product.name,
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Vendor: ${product.vendor}",
-                    style: TextStyle(color: Colors.grey)),
-                Text("Ksh ${product.price}",
-                    style: TextStyle(
-                        color: Colors.orange, fontWeight: FontWeight.bold)),
-              ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, // 2 columns
+            crossAxisSpacing: 16, // space between columns
+            mainAxisSpacing: 16, // Space between rows
+            childAspectRatio: 0.7 // Adjust height-to-width ratio
             ),
-            trailing: ElevatedButton(
-              onPressed: () {
-                Provider.of<OrderProvider>(context, listen: false)
-                    .addToCart(product);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: Text("Add to Cart", style: TextStyle(color: Colors.white)),
-            ),
-          ),
-        );
-      },
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      child: Image.asset(product.image, fit: BoxFit.cover)),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(product.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            Text("Vendor: ${product.vendor}",
+                                style: TextStyle(color: Colors.grey)),
+                            Text("Ksh ${product.price}",
+                                style: TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.bold))
+                          ])),
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<OrderProvider>(context, listen: false)
+                          .addToCart(product);
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    child: Text("Add to Cart",
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ]),
+          );
+        },
+      ),
     );
   }
 }
