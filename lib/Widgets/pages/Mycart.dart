@@ -11,7 +11,7 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     void navigatetoprofile() {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Profile()));
+          context, MaterialPageRoute(builder: (context) => ProfilePage()));
     }
 
     final cartProvider = Provider.of<CartProvider>(context);
@@ -96,40 +96,44 @@ class CartPage extends StatelessWidget {
     );
   }
 
- Widget _buildEmptyCart(BuildContext context) {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
-        SizedBox(height: 10),
-        Text(
-          "No items currently in the cart",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
-        ),
-        SizedBox(height: 20),
-
-        // Add Item Button
-        ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddEditItemPage(isEditMode: false)),
-            );
-          },
-          icon: Icon(Icons.add, color: Colors.white),
-          label: Text("Add an Item", style: TextStyle(color: Colors.white, fontSize: 16)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  Widget _buildEmptyCart(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
+          SizedBox(height: 10),
+          Text(
+            "No items currently in the cart",
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          SizedBox(height: 20),
 
+          // Add Item Button
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const AddEditItemPage(isEditMode: false)),
+              );
+            },
+            icon: Icon(Icons.add, color: Colors.white),
+            label: Text("Add an Item",
+                style: TextStyle(color: Colors.white, fontSize: 16)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSummary(BuildContext context, cartProvider) {
     return Container(

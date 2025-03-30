@@ -35,6 +35,22 @@ flutter:
 
   assets:
     - assets/Google.png
+    - assets/fruits.jpg
+    - assets/dairy.jpg
+    - assets/vegetables.jpg
+    - assets/vendor1.jpeg
+    - assets/vendor2.jpeg
+    - assets/vendor3.jpeg
+    - assets/mangoes.jpeg
+    - assets/coconuts.jpeg
+    - assets/potatoes.jpeg
+    - assets/fish.jpg
+    - assets/banana.png
+    - assets/kales.jpeg
+    - assets/carrot.jpeg
+    - assets/meat.jpeg
+    - assets/avocado.jpeg
+    - assets/milk.jpeg
     - .env  
 
       
