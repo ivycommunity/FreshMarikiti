@@ -5,6 +5,7 @@ import Schema from "./../Database/Schema";
 import * as Url from "url";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
+import * as crypto from "crypto";
 
 type Validator = (type: "Login" | "Signup", Data: {}) => Promise<string>;
 type SignUpCredentials = {
@@ -73,7 +74,7 @@ const DataStore: Validator = async (type, Data) => {
         if (emailValidator && passwordLength) {
           let success: boolean = false;
           await Schema.insertOne({
-            id: "122345",
+            id: crypto.randomBytes(10).toString("hex"),
             name: userData.name,
             email: userData.email,
             password: userData.password,
