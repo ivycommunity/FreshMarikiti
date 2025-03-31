@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/Widgets/drawer.dart';
+import 'package:marikiti/Widgets/pages/Shop.dart';
 import 'package:marikiti/Widgets/pages/Mycart.dart';
+import 'package:marikiti/core/constants/appcolors.dart';
+import 'dart:ui';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.lightGreen[50],
       appBar: AppBar(
         actions: [
           IconButton(
@@ -39,7 +48,7 @@ class HomePage extends StatelessWidget {
       ),
       drawer: FreshMarikitiDrawer(),
       body: SingleChildScrollView(
-        child: Padding(
+        child: Container(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,55 +57,72 @@ class HomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    categoryItem('Fruits', 'assets/fruits.png'),
-                    categoryItem("Vegies", 'assets/vegetables.png'),
-                    categoryItem("Dairy Products", 'assets/dairy.png')
+                    categoryItem('Fruits', 'assets/fruits.jpg'),
+                    categoryItem("Vegies", 'assets/vegetables.jpg'),
+                    categoryItem("Dairy Products", 'assets/dairy.jpg')
                   ],
                 ),
 
-                SizedBox(height: 10),
-
-                Column(
-                  children: [
-                    sectionTitle(
-                      "Vendors List", /*ontap*/
-                    ),
-                    SizedBox(height: 5),
-                    // Vendor section
-                    SizedBox(
-                      height: 150,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: vendors
-                            .map((vendor) => vendorCard(vendor))
-                            .toList(),
-                      ),
-                    ),
-                  ],
+                sectionTitle(
+                  "Vendors List", /*ontap*/
                 ),
-                SizedBox(height: 10),
+                // Vendor section
+                SizedBox(
+                  height: 220,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children:
+                        vendors.map((vendor) => vendorCard(vendor)).toList(),
+                  ),
+                ),
 
                 // Offers section
-                Column(children: [
-                  sectionTitle(
-                    "Offers", /*ontap*/
-                  ),
-                  SizedBox(height: 5),
-                  SizedBox(
-                      height: 170,
-                      child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children:
-                              offers.map((offer) => offerCard(offer)).toList()))
-                ]),
 
-                SizedBox(height: 10),
+                sectionTitle(
+                  "Offers", /*ontap*/
+                ),
+                SizedBox(
+                    height: 150,
+                    child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children:
+                            offers.map((offer) => offerCard(offer)).toList())),
+
+                SizedBox(height: 30),
+                Divider(
+                  color: Colors.white,
+                  thickness: 1,
+                  indent: 5, // Left spacing
+                  endIndent: 5, // Right spacing
+                ),
+                SizedBox(height: 20),
 
                 //Customer Reviews section
-                Column(
-                  children: [
-                    customerReviews(),
-                  ],
+
+                customerReviews(),
+                SizedBox(height: 20),
+
+                // Customer commment Section
+                SizedBox(
+                    height: 150,
+                    child: PageView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: comments.length,
+                        itemBuilder: (context, index) {
+                          return commentSection(comments[index]);
+                        })),
+                SizedBox(height: 15),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: Text('See More Reviews'),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+                  ),
                 )
               ],
             )),
@@ -112,13 +138,13 @@ class HomePage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         TextButton(
             onPressed: () {},
             child: Text(
               'See All',
               style: TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
+                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
             ))
       ],
     );
@@ -129,9 +155,15 @@ class HomePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: AssetImage(imagePath),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => OrderPage()));
+            },
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage(imagePath),
+            ),
           ),
           SizedBox(height: 5),
           Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -144,23 +176,54 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
-        width: 120,
+        width: 135,
+        height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
         ),
         child: Column(
           children: [
-            Image.asset(vendor['image']!, height: 80, fit: BoxFit.cover),
+            SizedBox(
+                width: 135,
+                height: 110,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                    child: Image.asset(vendor['image']!, fit: BoxFit.cover))),
             SizedBox(height: 5),
-            Text(vendor['name']!,
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(
-              vendor['description']!,
-              style: TextStyle(fontSize: 12),
-            ),
-            ElevatedButton(
-                onPressed: () {}, child: Text('View ${vendor['name']}'))
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(vendor['name']!,
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    vendor['description']!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+                  ),
+                  Spacer(),
+                  SizedBox(
+                      height: 30,
+                      child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text(
+                            'View ${vendor['name']}',
+                            style: TextStyle(fontSize: 10),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.red[300],
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8)))),
+                  SizedBox(height: 10)
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -171,32 +234,74 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0),
       child: Container(
-        width: 150,
         decoration: BoxDecoration(
-          color: Colors.orange[100],
+          color: offer['color'],
           borderRadius: BorderRadius.circular(10),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              // Image.asset(offer['image'], height: 50, fit: BoxFit.cover),
-              Text(offer['title'],
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(
-                offer['speech'],
-                style: TextStyle(),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Container(
+                  width: 160,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(offer['title']!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.white)),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        offer['speech']!,
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Flexible(
+                          child: Text(
+                        offer['description']!,
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                        softWrap: true,
+                      )),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        offer['stallNo']!,
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                          height: 22,
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: Text('View Offer'),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.black,
+                                  backgroundColor: Colors.white,
+                                )),
+                          )),
+                    ],
+                  ),
+                ),
               ),
-              Text(offer['description'], style: TextStyle()),
-              // Text(
-              //   offer['stallNo'],
-              //   style: TextStyle(),
-              // ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: ElevatedButton(onPressed: () {}, child: Text('View')),
-              ),
+              ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  child: Image.asset(offer['image']!,
+                      width: 100, fit: BoxFit.cover)),
             ],
           ),
         ),
@@ -214,10 +319,15 @@ class HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Customer Reviews',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5),
           Row(
             children: [
               Text('4.0',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
               SizedBox(width: 10),
               Icon(Icons.star, color: Colors.yellow[700]),
               Icon(Icons.star, color: Colors.yellow[700]),
@@ -227,38 +337,85 @@ class HomePage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 5),
-          Text('Based on 300 reviews'),
+          Text('BASED ON 300 REVIEWS',
+              style:
+                  TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
           SizedBox(height: 5),
-          Text('Mevis Katumi - Customer',
-              style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 }
 
+Widget commentSection(Map<String, String> comments) {
+  return Container(
+      decoration: BoxDecoration(color: Colors.transparent),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 8, 8, 8.0),
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage('assets/fruits.jpg'),
+            ),
+          ),
+          // SizedBox(width: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${comments['name']} - Customer',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.yellow[700]),
+                      Icon(Icons.star, color: Colors.yellow[700]),
+                      Icon(Icons.star, color: Colors.yellow[700]),
+                      Icon(Icons.star, color: Colors.yellow[700]),
+                      Icon(Icons.star, color: Colors.yellow[700]),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text(comments['comment'] ?? 'No comment available',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  SizedBox(height: 5),
+                  Text(
+                    comments['description'] ?? 'No description available',
+                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                    softWrap: true,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ));
+}
+
 // Sanple data
-final List<Map<String, String>> categories = [
-  {'name': 'Fruits', 'image': 'assets/fruits.png'},
-  {'name': 'Veggies', 'image': 'assets/veggies.png'},
-  {'name': 'Dairy', 'image': 'assets/dairy.png'},
-];
 
 final List<Map<String, String>> vendors = [
   {
     'name': 'Hassan Abdi',
     'description': 'Welcome customer, everyone says how my bananas are sweet',
-    'image': 'assets/vendor1.png'
+    'image': 'assets/vendor1.jpeg'
   },
   {
     'name': 'Maria Halima',
-    'description': 'Habari mimi ni muuza samaki',
-    'image': 'assets/vendor2.png'
+    'description':
+        'Habari mimi ni muuza samaki hodari. Wanunuzi wangu hufurahi',
+    'image': 'assets/vendor2.jpeg'
   },
   {
     'name': 'Susan Kamau',
     'description': 'Hello customer, welcome to my stand',
-    'image': 'assets/vendor3.png'
+    'image': 'assets/vendor3.jpeg'
   },
 ];
 
@@ -267,29 +424,49 @@ final List<Map<String, dynamic>> offers = [
     'title': "It's Mango Season!",
     'speech': 'Mama Salama says',
     'description': 'Get a 30% discount for every 10 mangoes you buy',
-    'stallNo': 20,
-    'image': 'assets/mango.png'
+    'stallNo': 'Stall No 20',
+    'image': 'assets/mangoes.jpeg',
+    'color': Colors.red[300],
   },
   {
     'title': "Coconuts from Mombasa!",
     'speech': 'Hassan says',
     'description': 'For every 5 coconuts you buy get 1 free...',
-    'stallNo': 104,
-    'image': 'assets/coconut.png'
+    'stallNo': 'Stall No 104',
+    'image': 'assets/coconuts.jpeg',
+    'color': Colors.green[300]
   },
   {
     'title': 'Potatoes perfect for fries!',
     'speech': 'Mr Kinyanjui says',
     'description':
         'Get a bag of fresh potatoes from Nyandarua at a 10% discount per kg. Hurry while stocks last!',
-    'stallNo': 003,
-    'image': 'assets/potatoes.png'
+    'stallNo': 'Stall No 003',
+    'image': 'assets/potatoes.jpeg',
+    'color': Colors.red[800]
   },
   {
     'title': 'Get the best fish in the market!',
     'speech': 'Mrs Onyango says',
     'description': 'Get the best fish in the market at a fair price!',
-    'stallNo': 403,
-    'image': 'assets/fish.png'
+    'stallNo': 'Stall No 403',
+    'image': 'assets/fish.jpg',
+    'color': Colors.red
+  }
+];
+
+List<Map<String, String>> comments = [
+  {
+    'name': 'Mevis Katami',
+    'image': 'assets/customer1.jpeg',
+    'comment': '"Very Convenient"',
+    'description':
+        'I love that I get to have my groceries delivered to me every month without fail'
+  },
+  {
+    'name': 'Kristian Ochola',
+    'image': 'assets/customer2.jpeg',
+    'comment': '"Use friendly',
+    'description': 'A very briliant app!'
   }
 ];
