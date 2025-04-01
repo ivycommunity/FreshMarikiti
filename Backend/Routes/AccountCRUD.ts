@@ -1,11 +1,17 @@
 //CRUD -> signup/login, Update user data,Delete user data
 import * as https from "https";
 import { IncomingMessage, ServerResponse } from "http";
-import Schema from "./../Database/Schema";
+import UserSchema from "../Database/Users";
 import * as Url from "url";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
 import * as crypto from "crypto";
+import * as bcrypt from "bcryptjs";
+import * as dotenv from "dotenv";
+
+dotenv.config({
+  path: "./.env",
+});
 
 type Validator = (type: "Login" | "Signup", Data: {}) => Promise<string>;
 type SignUpCredentials = {
@@ -26,26 +32,24 @@ type googleSuccess = {
   id_token: string;
 };
 type UpdateUserBody = {
-  access_token: string;
+  id: string;
   name?: string;
   email?: string;
   password?: string;
 };
 
 const jwtAccessT = process.env.JWT_ACCESS_TOKEN,
-  jwtRefreshT = process.env.JWT_REFRESH_TOKEN,
   googleID = process.env.GOAUTH_ID,
   googleSecret = process.env.GOAUTH_SECRET,
   googleAuthURL = "https://accounts.google.com/o/oauth2/auth",
   scope = "profile email";
-
+// 2,628,288
 const DataStore: Validator = async (type, Data) => {
     try {
       if (type == "Login") {
         let userData: LoginCredentials = Data as LoginCredentials;
 
-        if (userData.email == undefined || userData.password == undefined)
-          return "Incomplete credentials";
+        if (userData.email == undefined) return "Incomplete credentials";
 
         const emailValidator: Boolean =
           /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
@@ -54,10 +58,16 @@ const DataStore: Validator = async (type, Data) => {
 
         if (emailValidator == false) return "Invalid email";
 
-        let user = await Schema.findOne({ email: userData.email });
+        let user = await UserSchema.findOne({ email: userData.email });
 
-        if (!user) return "Non-existent user";
-        if (userData.password != user.password) return "Incorrect pass";
+        if (!user) {
+          return "Non-existent user";
+        }
+        if (user.password) {
+          if (bcrypt.compareSync(userData.password, user.password) == false)
+            return "Incorrect pass";
+        }
+
         return "Login successful";
       } else {
         let userData: SignUpCredentials = Data as SignUpCredentials;
@@ -69,29 +79,45 @@ const DataStore: Validator = async (type, Data) => {
             /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
               userData.email
             ),
-          passwordLength: Boolean = userData.password.length > 3;
+          passwordLength: Boolean = userData.password.length > 3,
+          hashedPassword = bcrypt.hashSync(userData.password, 10),
+          duplicateFinder = await UserSchema.findOne({ email: userData.email });
 
-        if (emailValidator && passwordLength) {
+        if (emailValidator && passwordLength && !duplicateFinder) {
           let success: boolean = false;
-          await Schema.insertOne({
+
+          let storage = await UserSchema.insertOne({
             id: crypto.randomBytes(10).toString("hex"),
             name: userData.name,
             email: userData.email,
-            password: userData.password,
-          })
-            .then(() => (success = true))
-            .catch(() => (success = false));
+            password: hashedPassword,
+            biocoins: 0,
+          });
+
+          if (storage) success = true;
+
           return success
             ? "Successful signup"
             : "Database Failure,signup failed, try again";
-        } else return !emailValidator ? "Invalid email" : "Password short";
+        } else
+          return !emailValidator
+            ? "Invalid email"
+            : passwordLength
+            ? "Password short"
+            : "Duplicate user";
       }
     } catch (error: any) {
       return error.message;
     }
   },
-  generateUserToken = (payload: any) => {
-    return jwt.sign(payload, jwtAccessT as string, { expiresIn: 36000 });
+  generateUserToken = async (payload: any) => {
+    const accessToken = jwt.sign(payload, jwtAccessT as string, {
+      expiresIn: "900s",
+    });
+
+    return {
+      accessToken: accessToken,
+    };
   };
 
 export const Signup = (
@@ -108,11 +134,26 @@ export const Signup = (
         const signup = await DataStore("Signup", JSON.parse(userData));
 
         if (signup == "Successful signup") {
-          request.User = userData;
-          response.writeHead(201, "Successful signup", {
-            "content-type": "text/plain",
+          userData = JSON.parse(userData);
+          let userDetails = await UserSchema.findOne({ email: userData.email });
+
+          let user = await generateUserToken({
+            id: userDetails?.id,
+            name: userData.name,
+            email: userData.email,
+            biocoins: userDetails?.biocoins,
           });
-          response.end("Successful");
+
+          if (user instanceof Error == false) {
+            response.writeHead(201, "Successful signup", {
+              "content-type": "text/plain",
+            });
+            response.end(
+              JSON.stringify({
+                accessToken: user.accessToken,
+              })
+            );
+          }
         } else {
           switch (signup) {
             case "Incomplete credentials":
@@ -130,6 +171,10 @@ export const Signup = (
             case "Password short":
               response.writeHead(401, "Password Length");
               response.end("Password length is short");
+              break;
+            case "Duplicate user":
+              response.writeHead(409);
+              response.end("Duplicate user, email already exists");
               break;
             default:
               response.writeHead(500, "Server failure");
@@ -152,25 +197,51 @@ export const Signup = (
     let userData: any = "";
 
     request.on("data", (data: Buffer) => {
-      if (data) userData += JSON.parse(data.toString());
+      if (data) userData += data.toString();
     });
-    request.on("close", async () => {
+    request.on("end", async () => {
       if (userData) {
-        const login = await DataStore("Login", userData);
+        const login = await DataStore("Login", JSON.parse(userData));
 
         if (login == "Login successful") {
-          request.User = userData;
-          response.writeHead(200, "Successful Login");
-          response.end("Login successful");
+          let user = JSON.parse(userData),
+            userDetails = await UserSchema.findOne({ email: user.email });
+
+          if (userDetails) {
+            let encodedUser = await generateUserToken({
+              id: userDetails.id,
+              name: userDetails.name,
+              email: userDetails.email,
+              biocoins: userDetails.biocoins,
+            });
+
+            if (encodedUser instanceof Error == false) {
+              response.writeHead(200, "Successful Login");
+              response.end(
+                JSON.stringify({
+                  accessToken: encodedUser.accessToken,
+                })
+              );
+              return;
+            } else {
+              response.writeHead(500);
+              response.end("Server error, please try again");
+              return;
+            }
+          }
         } else {
           switch (login) {
-            case "Non-existant user":
+            case "Non-existent user":
               response.writeHead(404, "User does not exist");
               response.end("User doesn't exist");
               break;
             case "Incorrect pass":
               response.writeHead(401, "Incorrect pass");
               response.end("Incorrect password passed");
+              break;
+            case "Incomplete credentials":
+              response.writeHead(401, "Incomplete Credentials");
+              response.end("Provide all credentials i.e. email and password");
               break;
             case "Invalid email":
               response.writeHead(400, "Email format");
@@ -212,6 +283,7 @@ export const Signup = (
       response.end("Authentication failed");
       return;
     }
+
     const postData = queryString.stringify({
       code,
       client_id: googleID,
@@ -266,37 +338,45 @@ export const Signup = (
                         )
                       );
                   })
-                    .then((user: any) => {
-                      request.User = user;
-                      let userToken = generateUserToken(user);
+                    .then(async (user: any) => {
+                      let newUserId = crypto.randomBytes(16).toString("hex"),
+                        userToken = generateUserToken({
+                          id: newUserId,
+                          name: user.name,
+                          email: user.email,
+                        }),
+                        duplicateFinder = await UserSchema.findOne({
+                          email: user.email,
+                        });
 
-                      if (request.User) {
-                        // Schema.insertOne({
-                        //   id: request.User.id,
-                        //   name: request.User.name,
-                        //   email: request.User.email,
-                        // });
+                      if (!duplicateFinder) {
+                        await UserSchema.insertOne({
+                          id: newUserId,
+                          name: user.name,
+                          email: user.email,
+                          biocoins: 0,
+                        });
+                        response.writeHead(201);
                         response.end(
                           JSON.stringify({
-                            accessToken: userToken,
+                            accessToken: (await userToken).accessToken,
                             expiresIn: 36000,
                           })
                         );
                         return;
-                      } else
-                        response.end(
-                          "Google authentication failed, please try again"
-                        );
-                      return;
+                      } else {
+                        response.writeHead(409);
+                        response.end("Email already exists");
+                        return;
+                      }
                     })
                     .catch(() => {
                       response.end("Error in authentication, please try again");
                       return;
                     });
                 });
-                userResponse.on("error", (error) => {
-                  console.log("Called here");
-                  console.log(error);
+                userResponse.on("error", () => {
+                  response.end("Error occured please try again");
                 });
               }
             );
@@ -321,148 +401,165 @@ export const Signup = (
     tokenRequest.write(postData);
     tokenRequest.end();
   },
-  retrieveUser = (token: string) => jwt.verify(token, jwtAccessT as string),
+  retrieveUser = async (accesstoken: string) => {
+    try {
+      let tokenVerification = jwt.verify(accesstoken, jwtAccessT as string);
+      return tokenVerification;
+    } catch (error: any) {
+      if (error instanceof jwt.TokenExpiredError) return "Expired";
+      else return "Invalid token";
+    }
+  },
   Update = async (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>
   ) => {
-    let details: any | null = null;
+    let details: any = "",
+      userAccessToken = request.headers["user_token"];
 
-    request.on("data", (data: Buffer) => {
-      details += data.toString();
-    });
+    if (userAccessToken) {
+      request.on("data", (data: Buffer) => {
+        details += data.toString();
+      });
 
-    request.on("end", async () => {
-      if (details) {
-        details = JSON.parse(details);
+      request.on("end", async () => {
+        if (details != null) {
+          let userFinder = await retrieveUser(userAccessToken as string),
+            userDetails: UpdateUserBody = JSON.parse(details);
 
-        let userFinder = retrieveUser((details as UpdateUserBody).access_token),
-          userDetails: UpdateUserBody = details;
+          if (userFinder) {
+            let dbUserFinder = await UserSchema.findOne({
+              id: userDetails.id,
+            });
 
-        if (userFinder) {
-          let dbUserFinder = await Schema.findOne({ email: userDetails.email });
+            if (dbUserFinder) {
+              let newDetails = {
+                  name: userDetails.name,
+                  email: userDetails.email,
+                  password: userDetails.password,
+                },
+                newValues = Object.entries(newDetails),
+                updatedValues: string[] = [];
 
-          if (dbUserFinder) {
-            let newDetails = {
-                name: userDetails.name,
-                email: userDetails.email,
-                password: userDetails.password,
-              },
-              newValues = Object.entries(newDetails),
-              updatedValues: string[] = [];
-
-            for (let [key, value] of newValues) {
-              if (value) {
-                if (key == "email") {
-                  const emailValidator: Boolean =
-                    /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-                      value
-                    );
-                  if (emailValidator)
-                    Schema.updateOne(
-                      { email: userDetails.email },
-                      { email: value }
-                    )
-                      .then(() => updatedValues.push("email"))
-                      .catch(() => updatedValues.push("emailfail"));
-                  else {
-                    response.end("Invalid email passed in, please try again");
-                    return;
+              for (let [key, value] of newValues) {
+                if (value) {
+                  if (key == "email") {
+                    const emailValidator: Boolean =
+                      /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
+                        value
+                      );
+                    if (emailValidator) {
+                      let update = await UserSchema.updateOne(
+                        { id: userDetails.id },
+                        { email: value }
+                      );
+                      if (update) updatedValues.push("email");
+                      else updatedValues.push("emailfail");
+                    } else {
+                      response.end("Invalid email passed in, please try again");
+                      return;
+                    }
+                  } else if (key == "password") {
+                    if (value.length < 3) {
+                      response.end(
+                        "Password length is short, pass in a password length ranging from [3-16]"
+                      );
+                      return;
+                    } else {
+                      let update = await UserSchema.updateOne(
+                        { id: userDetails.id },
+                        { password: bcrypt.hashSync(value, 10) }
+                      );
+                      if (update) updatedValues.push("password");
+                      else updatedValues.push("passwordfail");
+                    }
+                  } else if (key == "name") {
+                    if (value.length > 0) {
+                      let update = await UserSchema.updateOne(
+                        { id: userDetails.id },
+                        { name: userDetails.name }
+                      );
+                      if (update) updatedValues.push("name");
+                      else updatedValues.push("namefail");
+                    }
+                  } else {
+                    continue;
                   }
-                } else if (key == "password") {
-                  if (value.length < 3) {
-                    response.end(
-                      "Password length is short, pass in a password length ranging from [3-16]"
-                    );
-                    return;
-                  } else
-                    Schema.updateOne(
-                      { email: userDetails.email },
-                      { password: value }
-                    )
-                      .then(() => updatedValues.push("password"))
-                      .catch(() => updatedValues.push("passwordfail"));
-                } else if (key == "name") {
-                  if (value.length > 0)
-                    Schema.updateOne(
-                      { email: userDetails.email },
-                      { name: userDetails.name }
-                    )
-                      .then(() => updatedValues.push("name"))
-                      .catch(() => updatedValues.push("namefail"));
-                } else {
-                  continue;
                 }
               }
+              response.writeHead(201);
+              response.end(
+                `${updatedValues.includes("name") && "Name updated"}, ${
+                  updatedValues.includes("email") && "Email updated"
+                }, ${
+                  updatedValues.includes("password") && "Password updated"
+                }, ${
+                  updatedValues.includes("emailfail") &&
+                  "Email failed try again please"
+                }, ${
+                  updatedValues.includes("namefail") &&
+                  "Name failed, try again please"
+                }, ${
+                  updatedValues.includes("passwordfail") &&
+                  "Password failed,try again please"
+                }`
+              );
+            } else {
+              response.writeHead(404, "Non-existent user");
+              response.end("User doesn't exist");
             }
-
-            response.end(
-              `${updatedValues.includes("name") && "Name updated"}, ${
-                updatedValues.includes("email") && "Email updated"
-              }, ${updatedValues.includes("password") && "Password updated"}, ${
-                updatedValues.includes("emailfail") &&
-                "Email failed try again please"
-              }, ${
-                updatedValues.includes("namefail") &&
-                "Name failed, try again please"
-              }, ${
-                updatedValues.includes("passwordfail") &&
-                "Password failed,try again please"
-              }`
-            );
           } else {
-            response.writeHead(404, "Non-existent user");
-            response.end("User doesn't exist");
+            response.writeHead(403, "Unauthorized");
+            response.end(
+              "Expired or invalid token, please sign up or log in again"
+            );
           }
         } else {
-          response.writeHead(403, "Unauthorized");
+          response.writeHead(401, "Empty body content");
           response.end(
-            "Expired or invalid token, please sign up or log in again"
+            "No body passed in, try again with a body within the request"
           );
         }
-      } else {
-        response.writeHead(401, "Empty body content");
-        response.end(
-          "No body passed in, try again with a body within the request"
-        );
-      }
-    });
+      });
+    } else {
+      response.writeHead(401, "Unauthorized");
+      response.end(
+        "Authenticate yourself first, pass in an access token and refresh token"
+      );
+    }
   },
-  EraseUserSession = async (token: string) => {}, // If user exits session/ signs out
   Delete = async (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>
   ) => {
-    let token: any | null = null;
+    let userToken = request.headers["user_token"];
 
-    request.on("data", (data: Buffer) => {
-      token += data.toString();
-    });
-    request.on("end", async () => {
-      if (token) {
-        let user: any = retrieveUser(token);
+    if (userToken) {
+      let user: any = retrieveUser(userToken as string);
 
-        if (user) {
-          let userFinder = await Schema.findOne({ email: user.email });
-          if (userFinder) {
-            Schema.deleteOne({ email: user.email })
-              .then(() => response.end("Deletion successful"))
-              .catch(() => {
-                response.end("Deletion failed, please try again");
-              });
+      if (user) {
+        let userFinder = await UserSchema.findOne({ id: user.id });
+
+        if (userFinder) {
+          let Deletion = await UserSchema.deleteOne({ id: user.id });
+
+          if (Deletion) {
+            response.writeHead(204);
+            response.end("Deletion successful");
           } else {
-            response.writeHead(403, "Unauthorised token");
-            response.end("Token expired, try again");
+            response.writeHead(500);
+            response.end("Deletion failed: Server error, try again please");
           }
         } else {
-          response.writeHead(404, "Non-existent user");
-          response.end("User does not exist");
+          response.writeHead(403, "Unauthorised token");
+          response.end("Token expired, try again");
         }
       } else {
-        response.writeHead(403, "No token passed in");
-        response.end(
-          "No user token present, please try again, send in an accessToken body"
-        );
+        response.writeHead(404, "Non-existent user");
+        response.end("User does not exist");
       }
-    });
+    } else {
+      response.writeHead(401);
+      response.end("Unauthenticated, authenticate yourself");
+    }
   };

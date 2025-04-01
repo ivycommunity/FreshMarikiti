@@ -6,8 +6,8 @@ COPY package*.json ./
 
 COPY . .
 
-RUN npm ci \ && npm run dev
+RUN npm ci
 
 EXPOSE 3000
 
-CMD [ "server" ]
+CMD [ "node","Index.js" ]

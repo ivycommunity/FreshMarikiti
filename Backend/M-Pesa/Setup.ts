@@ -1,5 +1,11 @@
+import { retrieveUser } from "../Routes/AccountCRUD";
 import { IncomingMessage, ServerResponse } from "http";
 import * as https from "https";
+import * as dotenv from "dotenv";
+
+dotenv.config({
+  path: "./.env",
+});
 
 type PaymentDetails = {
   phoneNumber: string;
@@ -91,9 +97,9 @@ const Token = async (): Promise<any | Error> => {
             Requester: phoneNumber,
             Remarks: "Payment successful",
             QueueTimeOutURL:
-              "https://e2b0-197-237-24-105.ngrok-free.app/payment/redirect",
+              "https://5170-197-237-31-188.ngrok-free.app/payment/redirect",
             ResultURL:
-              "https://e2b0-197-237-24-105.ngrok-free.app/payment/timeout",
+              "https://5170-197-237-31-188.ngrok-free.app/payment/timeout",
           })
         );
         paymentRequest.end();
@@ -107,25 +113,37 @@ export const Payment = async (
   request: IncomingMessage,
   response: ServerResponse<IncomingMessage>
 ) => {
-  return new Promise((resolve, reject) => {
-    let payerData: string = "";
+  let userToken = request.headers["user_token"];
 
-    request.on("data", async (Data: Buffer) => {
-      payerData += Data.toString();
-    });
-    request.on("end", () => {
-      resolve(JSON.parse(payerData));
-    });
-    request.on("error", (error) => {
-      reject(error);
-    });
-  })
-    .then((data) => data as PaymentDetails)
-    .then((paymentData) => {
-      makePayment(paymentData.phoneNumber, paymentData.amount);
-      return response.end(paymentData);
-    })
-    .catch((error) => {
-      return response.end(error);
-    });
+  if (userToken) {
+    let user = await retrieveUser(userToken as string);
+
+    if (user) {
+      return new Promise((resolve, reject) => {
+        let payerData: string = "";
+
+        request.on("data", async (Data: Buffer) => {
+          payerData += Data.toString();
+        });
+        request.on("end", () => {
+          resolve(JSON.parse(payerData));
+        });
+        request.on("error", (error) => {
+          reject(error);
+        });
+      })
+        .then((data) => data as PaymentDetails)
+        .then((paymentData) => {
+          makePayment(paymentData.phoneNumber, paymentData.amount);
+          return response.end(paymentData);
+        })
+        .catch((error) => {
+          return response.end(error);
+        });
+    } else {
+      response.writeHead(403);
+      response.end("Expired access Token and refresh token does not exist");
+      return;
+    }
+  }
 };
