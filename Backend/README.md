@@ -8,8 +8,6 @@ So far covers the essentials for users i.e.:
 4.  M-Pesa payments to till number for in-app currency
 5.  Product addition and CRUD operations
 
-Also adds i.e. **Product addition, updates and deletion of products**
-
 ## To-do
 
 1. Add review handling.
