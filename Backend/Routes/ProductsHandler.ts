@@ -135,7 +135,7 @@ export const listProducts = async (
       let userToken = request.headers["user-token"];
 
       if (userToken) {
-        let User = verifyUser(userToken as string);
+        let User = await verifyUser(userToken as string);
 
         if (typeof User !== "string") {
           let itemData: any = "";
@@ -146,64 +146,72 @@ export const listProducts = async (
           request.on("end", async () => {
             itemData = JSON.parse(itemData);
 
-            if (!itemData.productid || !itemData.sellerid) {
-              response.writeHead(405);
-              response.end(
-                "Ensure to insert product id and seller id are present in the request body"
-              );
-            } else {
-              for (let [key, value] of Object.entries(itemData).map(
-                (_, index, array) => [
-                  array[index][0].toString().toLowerCase(),
-                  array[index][1],
-                ]
-              )) {
-                if (key == "name") {
-                  if ((value as string).length <= 0) {
-                    response.end(
-                      "Ensure product name has a value not an empty string"
+            if (User.id == itemData.sellerid) {
+              if (!itemData.productid || !itemData.sellerid) {
+                response.writeHead(405);
+                response.end(
+                  "Ensure to insert product id and seller id are present in the request body"
+                );
+              } else {
+                for (let [key, value] of Object.entries(itemData).map(
+                  (_, index, array) => [
+                    array[index][0].toString().toLowerCase(),
+                    array[index][1],
+                  ]
+                )) {
+                  if (key == "name") {
+                    if ((value as string).length <= 0) {
+                      response.end(
+                        "Ensure product name has a value not an empty string"
+                      );
+                      return;
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { name: value }
                     );
-                    return;
-                  }
-                  await Products.findOneAndUpdate(
-                    { id: itemData.productid },
-                    { name: value }
-                  );
-                } else if (key == "amount") {
-                  if (typeof value != "number") {
-                    response.writeHead(500);
-                    response.end("Invalid type, pass in a number for product");
-                    return;
-                  }
-                  await Products.findOneAndUpdate(
-                    { id: itemData.productid },
-                    { amount: value }
-                  );
-                } else if (key == "desc") {
-                  if ((value as string).length <= 0) {
-                    response.end(
-                      "Ensure a description is provided not an empty string"
+                  } else if (key == "amount") {
+                    if (typeof value != "number") {
+                      response.writeHead(500);
+                      response.end(
+                        "Invalid type, pass in a number for product"
+                      );
+                      return;
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { amount: value }
+                    );
+                  } else if (key == "desc") {
+                    if ((value as string).length <= 0) {
+                      response.end(
+                        "Ensure a description is provided not an empty string"
+                      );
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { description: value }
+                    );
+                  } else if (key == "image") {
+                    if ((value as string).length <= 0) {
+                      response.end(
+                        "Ensure image is provided with a valid source"
+                      );
+                      return;
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { image: value }
                     );
                   }
-                  await Products.findOneAndUpdate(
-                    { id: itemData.productid },
-                    { description: value }
-                  );
-                } else if (key == "image") {
-                  if ((value as string).length <= 0) {
-                    response.end(
-                      "Ensure image is provided with a valid source"
-                    );
-                    return;
-                  }
-                  await Products.findOneAndUpdate(
-                    { id: itemData.productid },
-                    { image: value }
-                  );
                 }
+                response.writeHead(201);
+                response.end("Update successful");
+                return;
               }
-              response.writeHead(201);
-              response.end("Update successful");
+            } else {
+              response.writeHead(403);
+              response.end("User does not own such as item");
               return;
             }
           });
@@ -251,27 +259,31 @@ export const listProducts = async (
         request.on("close", async () => {
           try {
             itemInfo = JSON.parse(itemInfo);
-
-            if (!itemInfo.productid || !itemInfo.sellerid) {
-              response.writeHead(409);
-              response.end(
-                "Incomplete credentials passed in, pass in the product id and seller id to continue"
-              );
-            } else {
-              let deletion = await Products.findOneAndDelete({
-                id: itemInfo.productid,
-                sellerid: itemInfo.sellerid,
-              });
-
-              if (deletion) {
-                response.writeHead(204);
-                response.end("Successful deletion");
-                return;
+            if (User.id == itemInfo.sellerid) {
+              if (!itemInfo.productid || !itemInfo.sellerid) {
+                response.writeHead(409);
+                response.end(
+                  "Incomplete credentials passed in, pass in the product id and seller id to continue"
+                );
               } else {
-                response.writeHead(500);
-                response.end("Database error, please try again later");
-                return;
+                let deletion = await Products.findOneAndDelete({
+                  id: itemInfo.productid,
+                  sellerid: itemInfo.sellerid,
+                });
+
+                if (deletion) {
+                  response.writeHead(204);
+                  response.end("Successful deletion");
+                  return;
+                } else {
+                  response.writeHead(500);
+                  response.end("Database error, please try again later");
+                  return;
+                }
               }
+            } else {
+              response.writeHead(403);
+              response.end("User does not have such an item in inventory");
             }
           } catch (error) {
             if (error instanceof SyntaxError) {

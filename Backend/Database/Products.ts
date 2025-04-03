@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface Product {
+export interface Product {
   id: string;
   name: string;
   seller: string;

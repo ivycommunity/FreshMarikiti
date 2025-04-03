@@ -43,7 +43,7 @@ const jwtAccessT = process.env.JWT_ACCESS_TOKEN,
   googleSecret = process.env.GOAUTH_SECRET,
   googleAuthURL = "https://accounts.google.com/o/oauth2/auth",
   scope = "profile email";
-// 2,628,288
+// 2628288;
 const DataStore: Validator = async (type, Data) => {
     try {
       if (type == "Login") {
@@ -52,9 +52,7 @@ const DataStore: Validator = async (type, Data) => {
         if (userData.email == undefined) return "Incomplete credentials";
 
         const emailValidator: Boolean =
-          /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-            userData.email
-          );
+          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gim.test(userData.email);
 
         if (emailValidator == false) return "Invalid email";
 
@@ -76,9 +74,7 @@ const DataStore: Validator = async (type, Data) => {
           return "Incomplete credentials";
 
         const emailValidator: Boolean =
-            /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-              userData.email
-            ),
+            /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gim.test(userData.email),
           passwordLength: Boolean = userData.password.length > 3,
           hashedPassword = bcrypt.hashSync(userData.password, 10),
           duplicateFinder = await UserSchema.findOne({ email: userData.email });
@@ -112,7 +108,7 @@ const DataStore: Validator = async (type, Data) => {
   },
   generateUserToken = async (payload: any) => {
     const accessToken = jwt.sign(payload, jwtAccessT as string, {
-      expiresIn: "900s",
+      expiresIn: "950s",
     });
 
     return {
