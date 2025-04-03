@@ -1,14 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:marikiti/Homepage.dart';
+import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/pages/About.dart';
 import 'package:marikiti/Widgets/pages/Mycart.dart';
 import 'package:marikiti/Widgets/pages/Profile.dart';
 import 'package:marikiti/Widgets/pages/Settings.dart';
 import 'package:marikiti/Widgets/pages/Subscription.dart';
 import 'package:marikiti/Widgets/pages/Support.dart';
-import 'package:marikiti/core/constants/providers/Themeprovders.dart';
+import 'package:marikiti/core/constants/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class FreshMarikitiDrawer extends StatefulWidget {

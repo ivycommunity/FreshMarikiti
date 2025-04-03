@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:marikiti/Homepage.dart';
+import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/pages/Mycart.dart';
 import 'package:marikiti/Widgets/pages/Profile.dart';
 import 'package:marikiti/core/constants/providers/orderprovider.dart';
