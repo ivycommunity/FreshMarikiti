@@ -4,7 +4,9 @@ import Users, { User } from "../Database/Users";
 import { retrieveUser } from "./AccountCRUD";
 import * as crypto from "crypto";
 
-const verifyUser = async (accessToken: string): Promise<string | User> => {
+export const verifyUser = async (
+  accessToken: string
+): Promise<string | User> => {
   let user: any = await retrieveUser(accessToken as string);
 
   if (typeof user !== "string") {

@@ -17,6 +17,7 @@ import {
   updateProduct,
   deleteProduct,
 } from "./Routes/ProductsHandler";
+import { Transact } from "./Routes/CurrencyHandler";
 
 dotenv.config({
   path: "./.env",
@@ -132,6 +133,13 @@ const server = http.createServer(
           break;
         case "delete":
           if (request.method == "DELETE") deleteProduct(request, response);
+          else {
+            response.writeHead(405);
+            response.end("Invalid http method, use DELETE instead");
+          }
+          break;
+        case "purchase":
+          if (request.method == "POST") Transact(request, response);
           else {
             response.writeHead(405);
             response.end("Invalid http method, use DELETE instead");

@@ -1,4 +1,5 @@
 import { retrieveUser } from "../Routes/AccountCRUD";
+import { updateFunds } from "../Routes/CurrencyHandler";
 import { IncomingMessage, ServerResponse } from "http";
 import * as dotenv from "dotenv";
 import * as https from "https";
@@ -7,13 +8,26 @@ dotenv.config({
   path: "./.env",
 });
 
-type PaymentDetails = {
-  phonenumber: string;
-  amount: number;
-};
 type TokenData = {
   access_token: string;
   expires_in: string;
+};
+type ResultParams = {
+  Key: string;
+  Value: string;
+};
+type PaymentResponse = {
+  Result: {
+    ResultType: number | string;
+    ResultCode: number | string;
+    ResultDesc: string;
+    ResultParameters: {
+      ResultParameter: ResultParams[];
+    };
+    ReferenceData: {
+      ReferenceItem: any[];
+    };
+  };
 };
 
 const consumerKey = process.env.MPESA_CKEY,
@@ -60,6 +74,7 @@ const Token = async (): Promise<any | Error> => {
     });
   },
   makePayment = async (
+    userId: string,
     phoneNumber: string,
     amount: number
   ): Promise<any | Error> => {
@@ -94,16 +109,17 @@ const Token = async (): Promise<any | Error> => {
           paymentRequest.write(
             JSON.stringify({
               Initiator: "testapi",
-              SecurityCredential: passKey,
+              SecurityCredential:
+                "EizCV+0APp/Nj/YV5nvmD3XavuRUSlgLBxw1vw/8GX/LXWRIjKsG3vGRvQOsp50OS/Ueq9I0ZiCUB+qqgnqsSn9DmnWJ0kOCr7YXWII5f4htC2amMV4qIdx+fRC4jJlOA7+Hvu5YOAlukewqci3gePW8LmPPXrryfvow/g3LBxRpM+NU4hqOwSgCxulz0XAYgn7XSNb6UY4OXPCEEl+FPNdbi2NnCyEuQTu4DwmFY332f+qfLXEIEaJOVzg5O512TPes5D1KSWYbPqhD0qcB+u4Yy+l0thzPNJ5gTDx/aZLkrh3EypAzcf14DXezMzZgHyMnXvI358OwFDdaF66vOA==",
               CommandID: "BusinessBuyGoods",
               SenderIdentifierType: "4",
               RecieverIdentifierType: 4,
               Amount: amount,
               PartyA: shortCode, //short code
-              PartyB: "000000",
+              PartyB: "600000",
               AccountReference: "353353",
               Requester: phoneNumber,
-              Remarks: "Payment successful",
+              Remarks: `Sent`,
               QueueTimeOutURL:
                 "https://f226-102-140-206-210.ngrok-free.app/payments/timeout",
               ResultURL:
@@ -146,6 +162,7 @@ export const Payment = async (
             } else {
               new Promise(async (resolve, reject) => {
                 let PaymentProcess = await makePayment(
+                  user.id,
                   paymentInfo.phonenumber,
                   paymentInfo.amount
                 );
@@ -154,17 +171,10 @@ export const Payment = async (
                   resolve(PaymentProcess);
                 else reject(PaymentProcess);
               })
-                .then((info: any) => JSON.parse(info))
-                .then((paymentInfo) => {
-                  if (paymentInfo.ResponseCode == "0") {
-                    response.writeHead(201);
-                    response.end("Payment process initiated");
-                  } else {
-                    response.writeHead(500);
-                    response.end(
-                      "Payment process aborted, server error. Try again later"
-                    );
-                  }
+                .then(() => {
+                  global.User = user.id;
+                  response.writeHead(201);
+                  response.end("Payment initiated");
                 })
                 .catch((error) => {
                   response.writeHead(500);
@@ -197,7 +207,6 @@ export const Payment = async (
     response: ServerResponse<IncomingMessage>
   ) => {
     try {
-      console.log("Success got called");
       let paymentResponse: any = "";
 
       response.writeHead(200);
@@ -207,7 +216,21 @@ export const Payment = async (
         paymentResponse += data.toString();
       });
       request.on("end", () => {
-        console.log(JSON.parse(paymentResponse));
+        let payment: PaymentResponse = JSON.parse(paymentResponse);
+        console.log(global.User);
+
+        if (payment.Result.ResultCode == "0") {
+          let index = payment.Result.ResultParameters.ResultParameter.findIndex(
+            (Info) => Info.Key == "Amount"
+          );
+          updateFunds(
+            global.User as string,
+            Number.parseInt(
+              payment.Result.ResultParameters.ResultParameter[index].Value
+            )
+          );
+        }
+        console.log(payment);
       });
     } catch (error) {
       console.log(error);
@@ -218,7 +241,6 @@ export const Payment = async (
     response: ServerResponse<IncomingMessage>
   ) => {
     try {
-      console.log("Timeout got called");
       let Error: any = "";
 
       response.writeHead(200);
