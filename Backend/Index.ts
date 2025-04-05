@@ -9,7 +9,7 @@ import {
   googleUserToken,
   retrieveUser,
 } from "./Routes/AccountCRUD";
-import { Payment, Success, Timeout } from "./M-Pesa/Setup";
+import { Payment, Redirect } from "./M-Pesa/Setup";
 import * as dotenv from "dotenv";
 import {
   listProducts,
@@ -102,10 +102,7 @@ const server = http.createServer(
           Payment(request, response);
           break;
         case "redirect":
-          Success(request, response);
-          break;
-        case "timeout":
-          Timeout(request, response);
+          Redirect(request, response);
           break;
         default:
           response.writeHead(404, "Invalid Route");

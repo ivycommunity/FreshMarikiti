@@ -29,7 +29,6 @@ export const updateFunds = async (
               { id: userFinder.id },
               { biocoins: userFinder.biocoins + amount }
             );
-            global.User = null;
             return "Successful update";
           } else return "User does not exist in the database";
         } else return "Non-existent user";
