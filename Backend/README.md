@@ -13,5 +13,4 @@ So far covers the essentials for users i.e.:
 1. Add review handling.
 2. Add storage for goals.
 3. Storage for feedback.
-4. Storage and tracking and analysis of sales made; Involves rating and comments made
-5. Enhance security on parsed tokens using encoding schemes
+4. Storage, tracking and analysis of sales made; Involves rating and comments made
