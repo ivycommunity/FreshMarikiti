@@ -33,7 +33,8 @@ type PaymentResponse = {
 const consumerKey = process.env.MPESA_CKEY,
   consumerSecret = process.env.MPESA_CSECRET,
   passKey = process.env.MPESA_PASSKEY,
-  shortCode = process.env.MPESA_SHORTCODE;
+  shortCode = process.env.MPESA_SHORTCODE,
+  callbackURL = process.env.MPESA_CALLBACKURL;
 
 const Token = async (): Promise<any | Error> => {
     return new Promise((resolve, reject) => {
@@ -144,8 +145,7 @@ const Token = async (): Promise<any | Error> => {
               PartyA: phonenumber,
               PartyB: shortCode,
               PhoneNumber: phonenumber,
-              CallBackURL:
-                "https://f226-102-140-206-210.ngrok-free.app/payments/redirect",
+              CallBackURL: callbackURL,
               AccountReference: "Test",
               TransactionDesc: "Test",
             })
