@@ -7,9 +7,7 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
-  cloud_firestore: ^5.6.4
-  firebase_auth: ^5.5.0
-  firebase_core: ^3.12.0
+  
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
@@ -24,6 +22,7 @@ dependencies:
   intl: ^0.19.0
   lottie: ^3.3.1
   provider: ^6.1.2
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +33,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/logo.png
     - assets/Google.png
     - assets/fruits.jpg
     - assets/dairy.jpg
@@ -51,6 +51,16 @@ flutter:
     - assets/meat.jpeg
     - assets/avocado.jpeg
     - assets/milk.jpeg
+    - assets/cow_milk.png
+    - assets/goat_milk.png
+    - assets/ghee.png
+    - assets/cream.png
+    - assets/yogurt.png
+    - assets/green_beans.jpeg
+    - assets/onion.jpeg
+    - assets/pepper.jpeg
+    - assets/lemon.jpeg
+    - assets/orange.jpeg
     - .env  
 
       

@@ -1,54 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:marikiti/Widgets/Widgets.dart';
+import 'package:marikiti/Widgets/custom_widgets.dart';
 import 'package:marikiti/core/constants/View/auth/login.dart';
-import 'package:marikiti/core/constants/providers/signup_provider.dart';
+import 'package:marikiti/core/constants/providers/user_provider.dart';
+import 'package:marikiti/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
-class SignUpScreen extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>(); // ✅ FIXED: Moved outside build()
-
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController(); // ✅ FIXED VARIABLE NAME
-
+class SignUpScreen extends StatefulWidget {
   SignUpScreen({super.key});
 
-  Future<void> signup(BuildContext context, AuthProvider authProvider) async {
-    if (_formKey.currentState!.validate()) {
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
-      String username = usernameController.text.toUpperCase().trim(); // ✅ FIXED VARIABLE NAME
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
 
-      String? result = await authProvider.signUp(email, password, username);
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final AuthService authService = AuthService();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result ?? 'Sign-up failed.')),
-      );
-
-      if (result == "Registration successful!") {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all the fields correctly.'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+  void signupUser() {
+    authService.signUpUser(
+        context: context,
+        email: emailController.text,
+        password: passwordController.text,
+        name: nameController.text);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false); // ✅ FIXED: Defined inside build
-
     return Scaffold(
       body: Form(
-        key: _formKey, 
+        key: _formKey,
         child: CustomScrollView(
           slivers: [
             SliverFillRemaining(
@@ -131,7 +114,7 @@ class SignUpScreen extends StatelessWidget {
 
                           // Username Field
                           buildTextField("Username", Icons.person,
-                              controller: usernameController),
+                              controller: nameController),
                           const SizedBox(height: 10),
 
                           // Password Field
@@ -168,10 +151,7 @@ class SignUpScreen extends StatelessWidget {
                             width: double.infinity,
                             height: 45,
                             child: ElevatedButton(
-                              onPressed: () {
-                                authProvider.isLoading?const CircularProgressIndicator():
-                                signup(context, authProvider); 
-                              },
+                              onPressed: signupUser,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[700],
                                 shape: RoundedRectangleBorder(
