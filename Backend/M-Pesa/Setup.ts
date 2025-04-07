@@ -30,6 +30,8 @@ type PaymentResponse = {
   };
 };
 
+console.log("Minor changes");
+
 const consumerKey = process.env.MPESA_CKEY,
   consumerSecret = process.env.MPESA_CSECRET,
   passKey = process.env.MPESA_PASSKEY,
