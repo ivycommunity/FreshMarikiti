@@ -26,7 +26,7 @@ class AuthService {
         token: '',
       );
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/signup'),
+        Uri.parse('${Constants.uri}/accounts/signup'),
         body: user.toJson(),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -54,7 +54,7 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
       http.Response res = await http.post(
-          Uri.parse('${Constants.uri}/api/signin'),
+          Uri.parse('${Constants.uri}/accounts/login'),
           body: jsonEncode({'email': email, 'password': password}),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8'
@@ -67,7 +67,7 @@ class AuthService {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             userProvider.setUser(res.body);
             await prefs.setString(
-                'x-auth-token', jsonDecode(res.body)['token']);
+                'x-auth-token', jsonDecode(res.body)['access-token']);
             navigator.pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomePage()),
               (route) => false,
