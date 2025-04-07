@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/pages/About.dart';
-import 'package:marikiti/Widgets/pages/Mycart.dart';
-import 'package:marikiti/Widgets/pages/Profile.dart';
+import 'package:marikiti/Widgets/pages/cart.dart';
+import 'package:marikiti/Widgets/pages/profile.dart';
 import 'package:marikiti/Widgets/pages/Settings.dart';
 import 'package:marikiti/Widgets/pages/Subscription.dart';
 import 'package:marikiti/Widgets/pages/Support.dart';

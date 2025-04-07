@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 
+class Seller {
+  final String name;
+  final double price;
+  final String quantity;
+
+  Seller({required this.name, required this.price, required this.quantity});
+}
+
 class Product {
   final String name;
   final String image;
-  final String vendor;
-  final double price;
   final String category; // Added category field
+  final List<Seller> vendors;
 
-  Product({
-    required this.name,
-    required this.image,
-    required this.vendor,
-    required this.price,
-    required this.category,
-  });
+  Product(
+      {required this.name,
+      required this.image,
+      required this.category,
+      required this.vendors});
 }
 
 class ProductProvider extends ChangeNotifier {
@@ -22,101 +27,140 @@ class ProductProvider extends ChangeNotifier {
     Product(
         name: "Cow Milk",
         image: "assets/cow_milk.png",
-        vendor: "Clifford",
-        price: 50,
-        category: "dairy"),
+        category: "dairy",
+        vendors: [
+          Seller(name: "Clifford", price: 55, quantity: "per litre"),
+          Seller(name: "Saitoti", price: 60, quantity: "per litre")
+        ]),
+
     Product(
         name: "Goat Milk",
         image: "assets/goat_milk.png",
-        vendor: "Saitoti",
-        price: 60,
-        category: "dairy"),
+        category: "dairy",
+        vendors: [
+          Seller(name: "Saitoti", price: 70, quantity: "per litre"),
+          Seller(name: "Ali", price: 75, quantity: "per litre")
+        ]),
+
     Product(
         name: "Ghee",
         image: "assets/ghee.png",
-        vendor: "Wafula",
-        price: 250,
-        category: "dairy"),
+        category: "dairy",
+        vendors: [
+          Seller(name: "Wafula", price: 600, quantity: "per 500g"),
+          Seller(name: "Christine", price: 900, quantity: "per kg")
+        ]),
+
     Product(
         name: "Cream",
         image: "assets/cream.png",
-        vendor: "Sandra",
-        price: 100,
-        category: "dairy"),
+        category: "dairy",
+        vendors: [
+          Seller(name: "Sandra", price: 150, quantity: "per jar"),
+          Seller(name: "James", price: 140, quantity: "per jar")
+        ]),
+
     Product(
-        name: "Yogurt",
+        name: "Yoghurt",
         image: "assets/yogurt.png",
-        vendor: "Charles",
-        price: 80,
-        category: "dairy"),
+        category: "dairy",
+        vendors: [
+          Seller(name: "Charles", price: 600, quantity: "1 litre"),
+          Seller(name: "Jackline", price: 350, quantity: "450ml")
+        ]),
 
     // 🍎 Fruits
     Product(
         name: "Avocado",
         image: "assets/avocado.jpeg",
-        vendor: "Murithi",
-        price: 30,
-        category: "fruits"),
+        category: "fruits",
+        vendors: [
+          Seller(name: "Khalifa", price: 30, quantity: "each"),
+          Seller(name: "Jacinta", price: 25, quantity: "each")
+        ]),
     Product(
         name: "Banana",
         image: "assets/banana.png",
-        vendor: "Onyango",
-        price: 10,
-        category: "fruits"),
+        category: "fruits",
+        vendors: [
+          Seller(name: "Onyango", price: 25, quantity: "per 3 pieces"),
+          Seller(name: "Kimathi", price: 20, quantity: "per 3 pieces")
+        ]),
     Product(
         name: "Mango",
         image: "assets/mangoes.jpeg",
-        vendor: "Mutuku",
-        price: 50,
-        category: "fruits"),
+        category: "fruits",
+        vendors: [
+          Seller(name: "Mutuku", price: 50, quantity: "each"),
+          Seller(name: "Salima", price: 50, quantity: "each")
+        ]),
     Product(
         name: "Oranges",
         image: "assets/orange.jpeg",
-        vendor: "Makena",
-        price: 40,
-        category: "fruits"),
+        category: "fruits",
+        vendors: [
+          Seller(name: "Makena", price: 30, quantity: "each"),
+          Seller(name: "Justin", price: 30, quantity: "each")
+        ]),
     Product(
         name: "Lemon",
         image: "assets/lemon.jpeg",
-        vendor: "Halima",
-        price: 70,
-        category: "fruits"),
+        category: "fruits",
+        vendors: [
+          Seller(name: "Halima", price: 25, quantity: "each"),
+          Seller(name: "Leon", price: 25, quantity: "each")
+        ]),
 
     // 🥬 Veggies
     Product(
         name: "Carrot",
         image: "assets/carrot.jpeg",
-        vendor: "Kimani",
-        price: 20,
-        category: "veggies"),
+        category: "veggies",
+        vendors: [
+          Seller(name: "Kimani", price: 50, quantity: "Kasuku"),
+          Seller(name: "Kariuki", price: 50, quantity: "Kasuku")
+        ]),
     Product(
-        name: "Sukuma Wiki",
+        name: "Green Veggies",
         image: "assets/kales.jpeg",
-        vendor: "Wangari",
-        price: 30,
-        category: "veggies"),
+        category: "veggies",
+        vendors: [
+          Seller(name: "Wangari", price: 10, quantity: "per bunch"),
+          Seller(name: "Susan", price: 10, quantity: "per bunch")
+        ]),
     Product(
         name: "Onions",
         image: "assets/onion.jpeg",
-        vendor: "Maria",
-        price: 25,
-        category: "veggies"),
+        category: "veggies",
+        vendors: [
+          Seller(name: "Maria", price: 80, quantity: "per kg"),
+          Seller(name: "James", price: 75, quantity: "per kg")
+        ]),
     Product(
         name: "Green Beans",
         image: "assets/green_beans.jpeg",
-        vendor: "Mama Kyle",
-        price: 15,
-        category: "veggies"),
+        category: "veggies",
+        vendors: [
+          Seller(name: "Jane", price: 140, quantity: "Kasuku"),
+          Seller(name: "Mary", price: 130, quantity: "Kasuku")
+        ]),
     Product(
         name: "Bell Pepper",
         image: "assets/pepper.jpeg",
-        vendor: "Cosmus Magendi",
-        price: 40,
-        category: "veggies"),
+        category: "veggies",
+        vendors: [
+          Seller(name: "Cosmus ", price: 50, quantity: "each"),
+          Seller(name: "Kate", price: 50, quantity: "each")
+        ]),
   ];
 
   /// Returns products based on category
   List<Product> getProductsByCategory(String category) {
     return _products.where((product) => product.category == category).toList();
+  }
+
+  List<Seller> getVendorsByProductName(String productName) {
+    final product = _products.firstWhere((p) => p.name == productName);
+    return product.vendors;
   }
 }

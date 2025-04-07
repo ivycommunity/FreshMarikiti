@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/Widgets/drawer.dart';
 import 'package:marikiti/Widgets/pages/product.dart';
-import 'package:marikiti/Widgets/pages/Mycart.dart';
+import 'package:marikiti/Widgets/pages/cart.dart';
 import 'package:marikiti/Widgets/pages/product.dart';
 import 'package:marikiti/core/constants/appcolors.dart';
 import 'dart:ui';
@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen[50],
+      backgroundColor: Color(0xFFF0F4C3),
       appBar: AppBar(
         actions: [
           IconButton(
@@ -21,21 +21,19 @@ class HomePage extends StatelessWidget {
                   context, MaterialPageRoute(builder: (context) => CartPage()));
             },
             icon: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.shopping_cart, color: Colors.black),
+              child: Icon(Icons.shopping_cart),
             ),
           ),
         ],
         title: Text(
           "Fresh Marikiti",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green[700],
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu, color: Colors.white),
+            icon: Icon(Icons.menu),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
@@ -44,7 +42,7 @@ class HomePage extends StatelessWidget {
       ),
       drawer: FreshMarikitiDrawer(),
       body: SingleChildScrollView(
-        child: Container(
+        child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,8 +122,6 @@ class HomePage extends StatelessWidget {
                     onPressed: () {},
                     child: Text('See More Reviews'),
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
                         padding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
                   ),
@@ -197,7 +193,9 @@ class SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+      Text(title,
+          style: TextStyle(
+              color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold)),
       TextButton(
           onPressed: () {},
           child: Text(
@@ -241,11 +239,15 @@ class VendorCard extends StatelessWidget {
                 // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(vendor.name,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold)),
                   Text(
                     vendor.description,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic),
                   ),
                   Spacer(),
                   SizedBox(
@@ -299,15 +301,15 @@ class OfferCard extends StatelessWidget {
                     children: [
                       Text(offer.title,
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Colors.white)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          )),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
                         offer.speech,
-                        style: TextStyle(fontSize: 12, color: Colors.white),
+                        style: TextStyle(fontSize: 12),
                       ),
                       SizedBox(
                         height: 5,
@@ -315,7 +317,7 @@ class OfferCard extends StatelessWidget {
                       Flexible(
                           child: Text(
                         offer.description,
-                        style: TextStyle(fontSize: 12, color: Colors.white),
+                        style: TextStyle(fontSize: 12),
                         softWrap: true,
                       )),
                       SizedBox(
@@ -323,7 +325,7 @@ class OfferCard extends StatelessWidget {
                       ),
                       Text(
                         offer.stallNo,
-                        style: TextStyle(fontSize: 12, color: Colors.white),
+                        style: TextStyle(fontSize: 12),
                       ),
                       SizedBox(height: 10),
                       SizedBox(
@@ -365,7 +367,7 @@ class CustomerReview extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.yellow[100],
+        color: Color(0xFFFFE7D1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

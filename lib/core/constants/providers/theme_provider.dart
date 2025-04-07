@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider with ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.light; // Default theme
+  ThemeMode _themeMode = ThemeMode.system; // Apply the theme used by the system
 
   ThemeMode get themeMode => _themeMode;
 

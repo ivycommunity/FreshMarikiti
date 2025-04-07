@@ -3,7 +3,7 @@ import 'package:marikiti/Widgets/custom_widgets.dart';
 import 'package:marikiti/core/constants/providers/Subscriptionprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:marikiti/Widgets/drawer.dart';
-import 'package:marikiti/Widgets/pages/Mycart.dart';
+import 'package:marikiti/Widgets/pages/cart.dart';
 import 'package:marikiti/core/constants/appcolors.dart';
 
 class SubscriptionPage extends StatefulWidget {

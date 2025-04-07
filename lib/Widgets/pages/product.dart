@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/pages/shop.dart';
 import 'package:marikiti/core/constants/providers/product_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -32,10 +33,7 @@ class ProductPage extends StatelessWidget {
         child: ListView.builder(
           itemCount: products.length,
           itemBuilder: (context, index) {
-            return ProductCard(
-              name: products[index].name,
-              image: products[index].image,
-            );
+            return ProductCard(product: products[index]);
           },
         ),
       ),
@@ -44,10 +42,9 @@ class ProductPage extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  final String name;
-  final String image;
+  final Product product;
 
-  ProductCard({required this.name, required this.image});
+  ProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +58,14 @@ class ProductCard extends StatelessWidget {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(25.0),
           child: Image.asset(
-            image,
+            product.image,
             width: 50,
             height: 70,
             fit: BoxFit.cover,
           ),
         ),
         title: Text(
-          name,
+          product.name,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         trailing: ElevatedButton(
@@ -78,7 +75,14 @@ class ProductCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
             ),
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ShopPage(product: product),
+              ),
+            );
+          },
           child: Text(
             'See vendors',
             style: TextStyle(color: Colors.white),

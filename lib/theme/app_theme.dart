@@ -10,18 +10,18 @@ class AppTheme {
       bodyMedium: TextStyle(color: Colors.black87),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white, // Icon & text color
+      backgroundColor: Color(0xFF214E25),
+      foregroundColor: Colors.black, // Icon & text color
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor: Color(0xFF7CC242),
         foregroundColor: Colors.white,
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: Colors.blue,
+        foregroundColor: Colors.red,
       ),
     ),
   );
@@ -35,7 +35,7 @@ class AppTheme {
       bodyMedium: TextStyle(color: Colors.white70),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: Color(0xFF214E25),
       foregroundColor: Colors.white,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
