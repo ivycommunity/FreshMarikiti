@@ -37,7 +37,7 @@ const server = http.createServer(
     if (urlSegment[0] == "accounts") {
       switch (urlSegment[1]) {
         case "user":
-          let userToken = request.headers["user-access-token"];
+          let userToken = request.headers["user-token"];
 
           if (userToken) {
             let user = await retrieveUser(userToken as string);
