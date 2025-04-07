@@ -17,8 +17,6 @@ export const verifyUser = async (
   } else return "Token is either expired or non-existent";
 };
 
-console.log("hello wold");
-
 export const listProducts = async (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>

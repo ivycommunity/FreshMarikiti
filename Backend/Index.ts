@@ -18,11 +18,11 @@ import {
   deleteProduct,
 } from "./Routes/ProductsHandler";
 import { Transact } from "./Routes/CurrencyHandler";
-console.log("hello wold");
+
 dotenv.config({
   path: "./.env",
 });
-
+//
 const portNumber = process.env.PORT,
   mongoUri = process.env.MONGO_URI;
 
@@ -37,7 +37,7 @@ const server = http.createServer(
     if (urlSegment[0] == "accounts") {
       switch (urlSegment[1]) {
         case "user":
-          let userToken = request.headers["user_access_token"];
+          let userToken = request.headers["user-access-token"];
 
           if (userToken) {
             let user = await retrieveUser(userToken as string);
@@ -160,6 +160,7 @@ server.listen(portNumber, async () => {
   mongoose
     .connect(mongoUri as string, {
       dbName: "Marikiti",
+      timeoutMS: 150000,
     })
     .then(() => {
       console.log(

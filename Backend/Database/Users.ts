@@ -1,4 +1,5 @@
 import * as mongoose from "mongoose";
+import { Middleware } from "./Middleware";
 
 export interface User {
   id: string;
@@ -8,7 +9,7 @@ export interface User {
   goals?: string;
   biocoins: number;
 }
-console.log("hello wold");
+
 const Schema = new mongoose.Schema<User>({
   id: {
     type: mongoose.SchemaTypes.String,
@@ -31,5 +32,7 @@ const Schema = new mongoose.Schema<User>({
     required: true,
   },
 });
+
+Middleware(Schema);
 
 export default mongoose.model("Users", Schema);

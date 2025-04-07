@@ -13,8 +13,6 @@ dotenv.config({
   path: "./.env",
 });
 
-console.log("hello wold");
-
 type Validator = (type: "Login" | "Signup", Data: {}) => Promise<string>;
 type SignUpCredentials = {
   name: string;

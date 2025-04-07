@@ -7,5 +7,3 @@ type Sale = {
   Products: Product[];
   ProfitDone: number;
 };
-
-console.log("hello wold");
