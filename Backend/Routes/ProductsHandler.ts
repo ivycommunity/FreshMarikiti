@@ -78,11 +78,12 @@ export const listProducts = async (
                 !itemInfo.sellerid ||
                 !itemInfo.seller ||
                 !itemInfo.phonenumber ||
+                !itemInfo.quantity ||
                 !itemInfo.amount
               ) {
                 response.writeHead(405);
                 response.end(
-                  "Incomplete body content, ensure to provide i.e. name, seller ID, seller, phonenumber, amount"
+                  "Incomplete body content, ensure to provide i.e. name, seller ID, seller, phonenumber, amount and quantity of the product required"
                 );
               } else {
                 try {
@@ -94,6 +95,7 @@ export const listProducts = async (
                     seller: itemInfo.seller,
                     phonenumber: itemInfo.phonenumber,
                     image: itemInfo.image ? itemInfo.image : "",
+                    quantity: itemInfo.quantity,
                     amount: itemInfo.amount,
                   });
                   response.writeHead(201);
@@ -205,7 +207,16 @@ export const listProducts = async (
                       { id: itemData.productid },
                       { image: value }
                     );
-                  }
+                  } else if (key == "quantity") {
+                    if ((value as number) < 0) {
+                      response.end("Invalid quantity, should be 0 or greater");
+                      return;
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { quantity: value }
+                    );
+                  } else continue;
                 }
                 response.writeHead(201);
                 response.end("Update successful");

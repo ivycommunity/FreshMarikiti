@@ -4,7 +4,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { verifyUser } from "./ProductsHandler";
 import Products from "../Database/Products";
 
-type Transacters = {
+export type Transacters = {
   buyerid: string;
   sellerid: string;
   productid: string;

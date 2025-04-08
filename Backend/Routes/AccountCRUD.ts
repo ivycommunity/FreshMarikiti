@@ -1,7 +1,8 @@
 //CRUD -> signup/login, Update user data,Delete user data
 import * as https from "https";
 import { IncomingMessage, ServerResponse } from "http";
-import UserSchema from "../Database/Users";
+import UserSchema, { type Product } from "../Database/Users";
+import Products from "../Database/Products";
 import * as Url from "url";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
@@ -272,11 +273,11 @@ export const Signup = (
     response: ServerResponse<IncomingMessage>
   ) => {
     const parsedURL = Url.parse(request.url as string, true),
-      { code } = parsedURL.query;
+      { code, error } = parsedURL.query;
 
-    if (!code) {
+    if (!code || error) {
       response.writeHead(403, "Code Invalid");
-      response.end("Authentication failed");
+      response.end("Authentication failed, user rejected");
       return;
     }
 
@@ -557,5 +558,89 @@ export const Signup = (
     } else {
       response.writeHead(401);
       response.end("Unauthenticated, authenticate yourself");
+    }
+  },
+  cartManagement = async (
+    request: IncomingMessage,
+    response: ServerResponse<IncomingMessage>
+  ) => {
+    const userToken = request.headers["user-token"];
+    let cartProducts: any = "",
+      cartItems: Product[] = [];
+
+    if (userToken) {
+      const user = await retrieveUser(userToken as string);
+
+      if (typeof user !== "string") {
+        request.on("data", (product: Buffer) => {
+          cartProducts += product.toString();
+        });
+        request.on("end", async () => {
+          try {
+            cartProducts = JSON.parse(cartProducts);
+
+            (cartProducts as Product[]).forEach(async (product) => {
+              if (!product.productid) {
+                response.writeHead(409);
+                response.end(
+                  "Incomplete product credentials, ensure to pass in the product id in the body"
+                );
+              } else {
+                let productFinder = await Products.findOne({
+                  id: product.productid,
+                });
+
+                if (productFinder) {
+                  if (
+                    product.name &&
+                    product.category &&
+                    product.quantity &&
+                    product.stock &&
+                    product.imageSource
+                  ) {
+                    cartItems.push(product);
+                  } else {
+                    response.writeHead(409);
+                    return response.end(
+                      "Incomplete credentails; Ensure to add the product id, name, category, quantity and stock"
+                    );
+                  }
+                } else {
+                  response.writeHead(404);
+                  return response.end("No such product exists");
+                }
+              }
+            });
+
+            let cartInsertion = await UserSchema.findOneAndUpdate(
+              { id: user.id },
+              {
+                cart: cartItems,
+              }
+            );
+
+            if (cartInsertion) {
+              response.writeHead(200);
+              return response.end("Cart products added");
+            }
+            response.writeHead(500);
+            return response.end("Database failure, please try again");
+          } catch (error) {
+            if (
+              (error as Error).name.includes("Syntax error") ||
+              (error as Error).message.includes("JSON")
+            ) {
+              response.writeHead(409);
+              return response.end("Invalid JSON format passed in");
+            }
+            response.writeHead(500);
+            return response.end("Server error occured");
+          }
+        });
+      } else {
+      }
+    } else {
+      response.writeHead(401);
+      response.end("Ensure to authenticate the user, pass in a header object.");
     }
   };

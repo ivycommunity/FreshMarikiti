@@ -8,6 +8,7 @@ import {
   googleAuthentication,
   googleUserToken,
   retrieveUser,
+  cartManagement,
 } from "./Routes/AccountCRUD";
 import { Payment, Redirect } from "./M-Pesa/Setup";
 import * as dotenv from "dotenv";
@@ -22,7 +23,7 @@ import { Transact } from "./Routes/CurrencyHandler";
 dotenv.config({
   path: "./.env",
 });
-//
+
 const portNumber = process.env.PORT,
   mongoUri = process.env.MONGO_URI;
 
@@ -75,9 +76,6 @@ const server = http.createServer(
         case "googleredirect":
           googleUserToken(request, response);
           break;
-        case "googlefail":
-          response.end("Google Oauth rejected");
-          break;
         case "update":
           if (request.method == "PUT") Update(request, response);
           else {
@@ -90,6 +88,13 @@ const server = http.createServer(
           else {
             response.writeHead(405);
             response.end("Invalid http method, try DELETE next time.");
+          }
+          break;
+        case "cart":
+          if (request.method == "POST") cartManagement(request, response);
+          else {
+            response.writeHead(405);
+            response.end("Invalid http method, try POST next time.");
           }
           break;
         default:
@@ -109,43 +114,43 @@ const server = http.createServer(
           response.end("Route passed in does not exist");
           break;
       }
-    } else if (urlSegment[0] == "products") {
-      switch (urlSegment[1]) {
-        case "list":
-          listProducts(request, response);
-          break;
-        case "add":
-          if (request.method == "POST") addProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use POST instead");
-          }
-          break;
-        case "update":
-          if (request.method == "PUT") updateProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use PUT instead");
-          }
-          break;
-        case "delete":
-          if (request.method == "DELETE") deleteProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
-          break;
-        case "purchase":
-          if (request.method == "POST") Transact(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
-          break;
-        default:
-          response.writeHead(404, "Invalid Route");
-          response.end("Route passed in does not exist");
-          break;
+    } else if (urlSegment[0] == "vendor") {
+      if (urlSegment[1] == "products") {
+        switch (urlSegment[2]) {
+          case "list":
+            listProducts(request, response);
+            break;
+          case "add":
+            if (request.method == "POST") addProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use POST instead");
+            }
+            break;
+          case "update":
+            if (request.method == "PUT") updateProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use PUT instead");
+            }
+            break;
+          case "delete":
+            if (request.method == "DELETE") deleteProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use DELETE instead");
+            }
+            break;
+          default:
+            response.writeHead(404, "Invalid Route");
+            response.end("Route passed in does not exist");
+            break;
+        }
+      } else {
+        response.writeHead(404);
+        response.end(
+          "Route not found,try adding /products on /vendor/products"
+        );
       }
     } else {
       response.writeHead(200, {

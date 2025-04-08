@@ -7,6 +7,7 @@ So far covers the essentials for users i.e.:
 3.  User authorization
 4.  M-Pesa payments to till number for in-app currency
 5.  Product addition and CRUD operations
+6.  Cart items storage support
 
 ## To-do
 

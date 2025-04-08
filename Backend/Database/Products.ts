@@ -8,8 +8,10 @@ export interface Product {
   sellerid: string;
   phonenumber: string;
   description?: string;
+  quantity: number;
   image?: string;
   amount: number;
+  category: string;
 }
 
 const Schema = new mongoose.Schema<Product>({
@@ -29,6 +31,10 @@ const Schema = new mongoose.Schema<Product>({
     type: mongoose.SchemaTypes.String,
     required: true,
   },
+  quantity: {
+    type: mongoose.SchemaTypes.Number,
+    required: true,
+  },
   phonenumber: {
     type: mongoose.SchemaTypes.String,
     required: true,
@@ -43,6 +49,10 @@ const Schema = new mongoose.Schema<Product>({
   },
   amount: {
     type: mongoose.SchemaTypes.Number,
+    required: true,
+  },
+  category: {
+    type: mongoose.SchemaTypes.String,
     required: true,
   },
 });
