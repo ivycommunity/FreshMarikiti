@@ -78,8 +78,10 @@ export const updateFunds = async (
                         await seller.updateOne({
                           biocoins: seller.biocoins + productFinder.amount,
                         });
-                        response.writeHead(200);
-                        response.end("Purchase successful");
+                        response.writeHead(200, "Succesful purchase", {
+                          "content-type": "application/json",
+                        });
+                        response.end(transacters);
                       }
                     } else {
                       response.writeHead(409);
