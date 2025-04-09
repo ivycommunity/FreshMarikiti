@@ -1,8 +1,7 @@
 //CRUD -> signup/login, Update user data,Delete user data
 import * as https from "https";
 import { IncomingMessage, ServerResponse } from "http";
-import UserSchema, { type Product } from "../Database/Users";
-import Products from "../Database/Products";
+import UserSchema from "../Database/Users";
 import * as Url from "url";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
@@ -19,6 +18,8 @@ type SignUpCredentials = {
   name: string;
   email: string;
   password: string;
+  goals?: string;
+  cart: any[];
 };
 type LoginCredentials = {
   email: string;
@@ -37,6 +38,8 @@ type UpdateUserBody = {
   name?: string;
   email?: string;
   password?: string;
+  goals?: string;
+  cart?: any[];
 };
 
 const jwtAccessT = process.env.JWT_ACCESS_TOKEN,
@@ -90,6 +93,12 @@ const DataStore: Validator = async (type, Data) => {
             name: userData.name,
             email: userData.email,
             password: hashedPassword,
+            goals: userData.goals
+              ? userData.goals.length > 0
+                ? userData.goals
+                : ""
+              : "",
+            cart: userData.cart,
             biocoins: 0,
           });
 
@@ -141,6 +150,7 @@ export const Signup = (
             name: userData.name,
             email: userData.email,
             biocoins: userDetails?.biocoins,
+            goals: userDetails?.goals,
             cart: userDetails?.cart,
           });
 
@@ -213,6 +223,7 @@ export const Signup = (
               name: userDetails.name,
               email: userDetails.email,
               biocoins: userDetails.biocoins,
+              goals: userDetails.goals,
               cart: userDetails.cart,
             });
 
@@ -442,6 +453,7 @@ export const Signup = (
                   name: userDetails.name,
                   email: userDetails.email,
                   password: userDetails.password,
+                  cart: userDetails.cart,
                 },
                 newValues = Object.entries(newDetails),
                 updatedValues: string[] = [];
@@ -451,7 +463,7 @@ export const Signup = (
                   if (key == "email") {
                     const emailValidator: Boolean =
                       /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-                        value
+                        value as string
                       );
                     if (emailValidator) {
                       let update = await UserSchema.updateOne(
@@ -473,7 +485,7 @@ export const Signup = (
                     } else {
                       let update = await UserSchema.updateOne(
                         { id: userDetails.id },
-                        { password: bcrypt.hashSync(value, 10) }
+                        { password: bcrypt.hashSync(value as string, 10) }
                       );
                       if (update) updatedValues.push("password");
                       else updatedValues.push("passwordfail");
@@ -496,6 +508,16 @@ export const Signup = (
                       if (update) updatedValues.push("cart");
                       else updatedValues.push("cartfail");
                     }
+                  } else if (key == "goals") {
+                    if (typeof value == "string" && value.length > 0) {
+                      let update = await UserSchema.updateOne(
+                        { id: userDetails.id },
+                        { goals: value }
+                      );
+
+                      if (update) updatedValues.push("goals");
+                      else updatedValues.push("goalsfail");
+                    }
                   } else {
                     continue;
                   }
@@ -505,9 +527,9 @@ export const Signup = (
               response.end(
                 `${updatedValues.includes("name") && "Name updated"}, ${
                   updatedValues.includes("email") && "Email updated"
-                }, ${
-                  updatedValues.includes("password") && "Password updated"
-                }, ${updatedValues.includes("cart") && "Cart updated"}, 
+                }, ${updatedValues.includes("password") && "Password updated"},
+                ${updatedValues.includes("cart") && "Cart updated"},
+                ${updatedValues.includes("goals") && "Goals updated"}, 
                  ${
                    updatedValues.includes("emailfail") &&
                    "Email failed try again please"
@@ -520,6 +542,9 @@ export const Signup = (
                 }, ${
                   updatedValues.includes("cartfail") &&
                   "Cart addition failed please try again"
+                }, ${
+                  updatedValues.includes("goals") &&
+                  "Goals change has not been made, please try again"
                 }`
               );
             } else {

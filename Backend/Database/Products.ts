@@ -12,6 +12,7 @@ export interface Product {
   image?: string;
   amount: number;
   category: string;
+  comments: any[];
 }
 
 const Schema = new mongoose.Schema<Product>({
@@ -53,6 +54,10 @@ const Schema = new mongoose.Schema<Product>({
   },
   category: {
     type: mongoose.SchemaTypes.String,
+    required: true,
+  },
+  comments: {
+    type: mongoose.SchemaTypes.Mixed,
     required: true,
   },
 });

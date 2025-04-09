@@ -18,6 +18,7 @@ import {
   deleteProduct,
 } from "./Routes/ProductsHandler";
 import { Transact } from "./Routes/CurrencyHandler";
+import { FeedbackRoute } from "./Routes/FeedbackHandler";
 
 dotenv.config({
   path: "./.env",
@@ -89,7 +90,6 @@ const server = http.createServer(
             response.end("Invalid http method, try DELETE next time.");
           }
           break;
-
         default:
           response.writeHead(404, { location: "/user" });
           break;
@@ -101,6 +101,9 @@ const server = http.createServer(
           break;
         case "redirect":
           Redirect(request, response);
+          break;
+        case "transact":
+          Transact(request, response);
           break;
         default:
           response.writeHead(404, "Invalid Route");
@@ -145,7 +148,10 @@ const server = http.createServer(
           "Route not found,try adding /products on /vendor/products"
         );
       }
-    } else {
+    } else if (urlSegment[0] == "admin") {
+      //To be done
+    } else if (urlSegment[0] == "feedback") FeedbackRoute(request, response);
+    else {
       response.writeHead(200, {
         "content-type": "text/html",
       });
