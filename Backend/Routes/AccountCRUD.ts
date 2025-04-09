@@ -43,8 +43,10 @@ const jwtAccessT = process.env.JWT_ACCESS_TOKEN,
   googleID = process.env.GOAUTH_ID,
   googleSecret = process.env.GOAUTH_SECRET,
   googleAuthURL = "https://accounts.google.com/o/oauth2/auth",
+  googleTokenURL = "https://oauth2.googleapis.com/token",
+  googleRedirectURL = process.env.GOOGLE_REDIRECT,
   scope = "profile email";
-// 2628288;
+
 const DataStore: Validator = async (type, Data) => {
     try {
       if (type == "Login") {
@@ -139,6 +141,7 @@ export const Signup = (
             name: userData.name,
             email: userData.email,
             biocoins: userDetails?.biocoins,
+            cart: userDetails?.cart,
           });
 
           if (user instanceof Error == false) {
@@ -210,6 +213,7 @@ export const Signup = (
               name: userDetails.name,
               email: userDetails.email,
               biocoins: userDetails.biocoins,
+              cart: userDetails.cart,
             });
 
             if (encodedUser instanceof Error == false) {
@@ -260,7 +264,7 @@ export const Signup = (
   },
   googleAuthentication = async (response: ServerResponse<IncomingMessage>) => {
     const authUrl = `${googleAuthURL}?client_id=${googleID}&redirect_uri=${encodeURIComponent(
-      "http://localhost:3000/accounts/googleredirect"
+      googleRedirectURL as string
     )}&response_type=code&scope=${encodeURIComponent(
       scope
     )}&access_type=offline`;
@@ -285,12 +289,12 @@ export const Signup = (
       code,
       client_id: googleID,
       client_secret: googleSecret,
-      redirect_uri: "http://localhost:3000/accounts/googleredirect",
+      redirect_uri: googleRedirectURL,
       grant_type: "authorization_code",
     });
 
     let tokenRequest = https.request(
-      "https://oauth2.googleapis.com/token",
+      googleTokenURL,
       {
         method: "POST",
         headers: {
@@ -341,6 +345,7 @@ export const Signup = (
                           id: newUserId,
                           name: user.name,
                           email: user.email,
+                          cart: [],
                         }),
                         duplicateFinder = await UserSchema.findOne({
                           email: user.email,
@@ -352,6 +357,7 @@ export const Signup = (
                           name: user.name,
                           email: user.email,
                           biocoins: 0,
+                          cart: [],
                         });
                         response.writeHead(201);
                         response.end(
@@ -368,11 +374,13 @@ export const Signup = (
                       }
                     })
                     .catch(() => {
+                      response.writeHead(500);
                       response.end("Error in authentication, please try again");
                       return;
                     });
                 });
                 userResponse.on("error", () => {
+                  response.writeHead(500);
                   response.end("Error occured please try again");
                 });
               }
@@ -479,6 +487,15 @@ export const Signup = (
                       if (update) updatedValues.push("name");
                       else updatedValues.push("namefail");
                     }
+                  } else if (key == "cart") {
+                    if (Array.isArray(value)) {
+                      let update = await UserSchema.updateOne(
+                        { id: userDetails.id },
+                        { cart: value }
+                      );
+                      if (update) updatedValues.push("cart");
+                      else updatedValues.push("cartfail");
+                    }
                   } else {
                     continue;
                   }
@@ -490,15 +507,19 @@ export const Signup = (
                   updatedValues.includes("email") && "Email updated"
                 }, ${
                   updatedValues.includes("password") && "Password updated"
-                }, ${
-                  updatedValues.includes("emailfail") &&
-                  "Email failed try again please"
-                }, ${
+                }, ${updatedValues.includes("cart") && "Cart updated"}, 
+                 ${
+                   updatedValues.includes("emailfail") &&
+                   "Email failed try again please"
+                 }, ${
                   updatedValues.includes("namefail") &&
                   "Name failed, try again please"
                 }, ${
                   updatedValues.includes("passwordfail") &&
                   "Password failed,try again please"
+                }, ${
+                  updatedValues.includes("cartfail") &&
+                  "Cart addition failed please try again"
                 }`
               );
             } else {
@@ -558,89 +579,5 @@ export const Signup = (
     } else {
       response.writeHead(401);
       response.end("Unauthenticated, authenticate yourself");
-    }
-  },
-  cartManagement = async (
-    request: IncomingMessage,
-    response: ServerResponse<IncomingMessage>
-  ) => {
-    const userToken = request.headers["user-token"];
-    let cartProducts: any = "",
-      cartItems: Product[] = [];
-
-    if (userToken) {
-      const user = await retrieveUser(userToken as string);
-
-      if (typeof user !== "string") {
-        request.on("data", (product: Buffer) => {
-          cartProducts += product.toString();
-        });
-        request.on("end", async () => {
-          try {
-            cartProducts = JSON.parse(cartProducts);
-
-            (cartProducts as Product[]).forEach(async (product) => {
-              if (!product.productid) {
-                response.writeHead(409);
-                response.end(
-                  "Incomplete product credentials, ensure to pass in the product id in the body"
-                );
-              } else {
-                let productFinder = await Products.findOne({
-                  id: product.productid,
-                });
-
-                if (productFinder) {
-                  if (
-                    product.name &&
-                    product.category &&
-                    product.quantity &&
-                    product.stock &&
-                    product.imageSource
-                  ) {
-                    cartItems.push(product);
-                  } else {
-                    response.writeHead(409);
-                    return response.end(
-                      "Incomplete credentails; Ensure to add the product id, name, category, quantity and stock"
-                    );
-                  }
-                } else {
-                  response.writeHead(404);
-                  return response.end("No such product exists");
-                }
-              }
-            });
-
-            let cartInsertion = await UserSchema.findOneAndUpdate(
-              { id: user.id },
-              {
-                cart: cartItems,
-              }
-            );
-
-            if (cartInsertion) {
-              response.writeHead(200);
-              return response.end("Cart products added");
-            }
-            response.writeHead(500);
-            return response.end("Database failure, please try again");
-          } catch (error) {
-            if (
-              (error as Error).name.includes("Syntax error") ||
-              (error as Error).message.includes("JSON")
-            ) {
-              response.writeHead(409);
-              return response.end("Invalid JSON format passed in");
-            }
-            response.writeHead(500);
-            return response.end("Server error occured");
-          }
-        });
-      } else {
-      }
-    } else {
-      response.writeHead(401);
-      response.end("Ensure to authenticate the user, pass in a header object.");
     }
   };

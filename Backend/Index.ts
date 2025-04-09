@@ -8,7 +8,6 @@ import {
   googleAuthentication,
   googleUserToken,
   retrieveUser,
-  cartManagement,
 } from "./Routes/AccountCRUD";
 import { Payment, Redirect } from "./M-Pesa/Setup";
 import * as dotenv from "dotenv";
@@ -90,13 +89,7 @@ const server = http.createServer(
             response.end("Invalid http method, try DELETE next time.");
           }
           break;
-        case "cart":
-          if (request.method == "POST") cartManagement(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, try POST next time.");
-          }
-          break;
+
         default:
           response.writeHead(404, { location: "/user" });
           break;
@@ -165,7 +158,6 @@ server.listen(portNumber, async () => {
   mongoose
     .connect(mongoUri as string, {
       dbName: "Marikiti",
-      timeoutMS: 150000,
     })
     .then(() => {
       console.log(
