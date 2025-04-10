@@ -16,7 +16,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen[50],
+      //backgroundColor: Colors.lightGreen[50],
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         actions: [
           IconButton(
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage> {
                   context, MaterialPageRoute(builder: (context) => CartPage()));
             },
             icon: CircleAvatar(
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               child: Icon(Icons.shopping_cart, color: Colors.black),
             ),
           ),
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green[700],
+        backgroundColor: Theme.of(context).colorScheme.primary,
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) => IconButton(
@@ -144,7 +145,9 @@ class _HomePageState extends State<HomePage> {
             child: Text(
               'See All',
               style: TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14),
             ))
       ],
     );
@@ -180,13 +183,14 @@ class _HomePageState extends State<HomePage> {
         height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surfaceContainer,
         ),
         child: Column(
           children: [
             SizedBox(
                 width: 135,
                 height: 110,
+                // vendorCard image
                 child: ClipRRect(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10),
@@ -200,11 +204,18 @@ class _HomePageState extends State<HomePage> {
                 // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(vendor['name']!,
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      )),
                   Text(
                     vendor['description']!,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   Spacer(),
                   SizedBox(
@@ -217,7 +228,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                           style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Colors.red[300],
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .secondaryContainer,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 8)))),
                   SizedBox(height: 10)
@@ -313,7 +326,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.yellow[100],
+        color: Color(0xFF9FD0B9),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(

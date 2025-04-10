@@ -51,6 +51,6 @@ flutter:
     - assets/meat.jpeg
     - assets/avocado.jpeg
     - assets/milk.jpeg
-    - .env  
+    
 
       

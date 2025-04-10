@@ -78,7 +78,7 @@ class _FreshMarikitiDrawerState extends State<FreshMarikitiDrawer> {
               ),
               title: const Text('Dark Mode'),
               trailing: Switch(
-                  value: themeprovider.themeMode == ThemeMode.dark,
+                  value: themeprovider.themeData == ThemeData.dark,
                   onChanged: (value) {
                     themeprovider.toggleTheme();
                   }),
