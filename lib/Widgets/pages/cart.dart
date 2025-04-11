@@ -1,206 +1,204 @@
 import 'package:flutter/material.dart';
-import 'package:marikiti/Widgets/pages/Additems.page.dart';
 import 'package:marikiti/Widgets/pages/CheckoutPage.dart';
-import 'package:marikiti/Widgets/pages/profile.dart';
-
-import 'package:marikiti/models/cartmodel.dart';
+import 'package:marikiti/core/constants/providers/cart_provider.dart';
+import 'package:marikiti/homepage.dart';
 import 'package:provider/provider.dart';
+import 'package:marikiti/core/constants/providers/product_provider.dart';
 
 class CartPage extends StatelessWidget {
+  const CartPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    void navigatetoprofile() {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ProfilePage()));
-    }
-
     final cartProvider = Provider.of<CartProvider>(context);
+    final items = cartProvider.cartItems;
+
+    const deliveryCharge = 100.0;
+    final subtotal = cartProvider.subtotal;
+    final total = subtotal + deliveryCharge;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFDE5C7),
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () => navigatetoprofile(),
-            icon: Icon(Icons.person),
-            color: Colors.black,
+        title: const Text("MY CART"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(backgroundColor: Colors.orange),
           ),
         ],
-        title: Text(
-          "My Cart",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.black,
-        ),
-        backgroundColor: Colors.white,
       ),
-      body: cartProvider.cartItems.isEmpty
-          ? _buildEmptyCart(context)
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: cartProvider.cartItems.length,
-                    itemBuilder: (context, index) {
-                      final item = cartProvider.cartItems[index];
-                      return Card(
-                        color: Color(0xFF7CC242),
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: AssetImage(item.image),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+
+                return Container(
+                  margin: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF7CC242),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.fromLTRB(9, 2, 9, 2),
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage(item.product.image),
+                    ),
+                    title:
+                        Text("${item.product.name}\nFrom: ${item.vendor.name}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            )),
+                    subtitle: Text("Ksh ${item.vendor.price}",
+                        style: const TextStyle(color: Colors.white)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          title: Text(
-                            item.name,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                              "From: ${item.seller}\nKsh ${item.price}",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
-                          trailing: Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                icon: Icon(Icons.remove_circle_outline,
-                                    color: Colors.black),
-                                onPressed: () =>
-                                    cartProvider.reduceItems(index),
+                              SizedBox(
+                                height: 23,
+                                width: 23,
+                                child: GestureDetector(
+                                  child: Icon(Icons.remove,
+                                      color: Colors.black, size: 18),
+                                  onTap: () {
+                                    cartProvider.reduceItems(index);
+                                  },
+                                ),
                               ),
-                              Text("${item.quantity}",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black)),
-                              IconButton(
-                                icon: Icon(Icons.add_circle_outline,
-                                    color: Colors.black),
-                                onPressed: () =>
-                                    cartProvider.increaseItems(index),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text(
+                                  "${item.quantity}",
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.delete_outline,
-                                    color: Colors.black),
-                                onPressed: () => cartProvider.removeItem(index),
+                              SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: GestureDetector(
+                                  child: Icon(Icons.add,
+                                      color: Colors.black, size: 18),
+                                  onTap: () {
+                                    final cartProvider =
+                                        context.read<CartProvider>();
+                                    final product =
+                                        cartProvider.cartItems[index];
+
+                                    if (product.quantity <
+                                        product.vendor.inStock) {
+                                      cartProvider.increaseItems(index);
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Only ${product.vendor.inStock} in stock'),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      );
+                        SizedBox(width: 4),
+                        GestureDetector(
+                          child: const Icon(Icons.delete, color: Colors.black),
+                          onTap: () {
+                            cartProvider.removeItem(index);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Subtotal",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text("Ksh ${subtotal.toStringAsFixed(0)}",
+                        style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text("Delivery Charge", style: TextStyle(fontSize: 18)),
+                    Text("Ksh 100", style: TextStyle(fontSize: 18)),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Total",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text("Ksh ${total.toStringAsFixed(0)}",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      padding: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => CheckoutPage()));
                     },
+                    child: const Text("PROCEED TO CHECKOUT",
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
-                _buildSummary(context, cartProvider),
+                const SizedBox(height: 10),
+                Center(
+                    child: const Text(
+                  "Would you like to add this order to your subscription?",
+                )),
+                const SizedBox(height: 10),
               ],
             ),
-    );
-  }
-
-  Widget _buildEmptyCart(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey),
-          SizedBox(height: 10),
-          Text(
-            "No items currently in the cart",
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
-          ),
-          SizedBox(height: 20),
-
-          // Add Item Button
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const AddEditItemPage(isEditMode: false)),
-              );
-            },
-            icon: Icon(Icons.add, color: Colors.white),
-            label: Text("Add an Item",
-                style: TextStyle(color: Colors.white, fontSize: 16)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[700],
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummary(BuildContext context, cartProvider) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
-      ),
-      child: Column(
-        children: [
-          _summaryRow("Subtotal", "Ksh ${cartProvider.subtotal}"),
-          _summaryRow("Delivery Charge", "Ksh ${cartProvider.deliveryCharge}"),
-          _summaryRow("Total", "Ksh ${cartProvider.total}", isBold: true),
-          SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 40),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-            ),
-            onPressed: cartProvider.cartItems.isEmpty
-                ? null
-                : () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CheckoutPage()));
-                  },
-            child: Text("PROCEED TO CHECKOUT",
-                style: TextStyle(fontSize: 15, color: Colors.white)),
-          ),
-          SizedBox(height: 5),
-          Text(
-            "Would you like to add this order to your subscription?",
-            style: TextStyle(color: Colors.black),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _summaryRow(String label, String value, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 16, color: Colors.black),
-          ),
-          Text(value,
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                  color: Colors.black)),
+          )
         ],
       ),
     );

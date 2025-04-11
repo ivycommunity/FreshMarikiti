@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/splash_screen.dart';
-import 'package:marikiti/models/cartmodel.dart';
 
 import 'package:marikiti/core/constants/providers/product_provider.dart';
 import 'package:marikiti/core/constants/providers/splash_provider.dart';
@@ -10,7 +9,7 @@ import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Subscriptionprovider.dart';
 import 'package:marikiti/core/constants/providers/theme_provider.dart';
 import 'package:marikiti/core/constants/providers/itemprovider.dart';
-//import 'package:marikiti/core/constants/providers/orderprovider.dart';
+import 'package:marikiti/core/constants/providers/cart_provider.dart';
 import 'package:marikiti/core/constants/providers/passwordprovider.dart';
 import 'package:marikiti/core/constants/providers/user_provider.dart';
 import 'package:marikiti/theme/app_theme.dart';
@@ -35,11 +34,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => Subscriptionprovider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(
           create: (_) => ItemProvider(),
         ),
-        ChangeNotifierProvider(create: (_) => SplashProvider()),
       ],
       child: const Marikiti(),
     ),
@@ -51,7 +49,7 @@ class Marikiti extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeprovider = Provider.of<ThemeProvider>(context);
+    //final themeprovider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       supportedLocales: const [
         Locale('en', ''),
@@ -61,9 +59,9 @@ class Marikiti extends StatelessWidget {
         
           
       ],
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeprovider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      //themeMode: themeprovider.themeData,
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash_screen',
       routes: {
