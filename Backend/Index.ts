@@ -18,7 +18,8 @@ import {
   deleteProduct,
 } from "./Routes/ProductsHandler";
 import { Transact } from "./Routes/CurrencyHandler";
-console.log("hello wold");
+import { FeedbackRoute } from "./Routes/FeedbackHandler";
+
 dotenv.config({
   path: "./.env",
 });
@@ -37,7 +38,7 @@ const server = http.createServer(
     if (urlSegment[0] == "accounts") {
       switch (urlSegment[1]) {
         case "user":
-          let userToken = request.headers["user_access_token"];
+          let userToken = request.headers["user-token"];
 
           if (userToken) {
             let user = await retrieveUser(userToken as string);
@@ -75,9 +76,6 @@ const server = http.createServer(
         case "googleredirect":
           googleUserToken(request, response);
           break;
-        case "googlefail":
-          response.end("Google Oauth rejected");
-          break;
         case "update":
           if (request.method == "PUT") Update(request, response);
           else {
@@ -104,50 +102,56 @@ const server = http.createServer(
         case "redirect":
           Redirect(request, response);
           break;
-        default:
-          response.writeHead(404, "Invalid Route");
-          response.end("Route passed in does not exist");
-          break;
-      }
-    } else if (urlSegment[0] == "products") {
-      switch (urlSegment[1]) {
-        case "list":
-          listProducts(request, response);
-          break;
-        case "add":
-          if (request.method == "POST") addProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use POST instead");
-          }
-          break;
-        case "update":
-          if (request.method == "PUT") updateProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use PUT instead");
-          }
-          break;
-        case "delete":
-          if (request.method == "DELETE") deleteProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
-          break;
-        case "purchase":
-          if (request.method == "POST") Transact(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
+        case "transact":
+          Transact(request, response);
           break;
         default:
           response.writeHead(404, "Invalid Route");
           response.end("Route passed in does not exist");
           break;
       }
-    } else {
+    } else if (urlSegment[0] == "vendor") {
+      if (urlSegment[1] == "products") {
+        switch (urlSegment[2]) {
+          case "list":
+            listProducts(request, response);
+            break;
+          case "add":
+            if (request.method == "POST") addProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use POST instead");
+            }
+            break;
+          case "update":
+            if (request.method == "PUT") updateProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use PUT instead");
+            }
+            break;
+          case "delete":
+            if (request.method == "DELETE") deleteProduct(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, use DELETE instead");
+            }
+            break;
+          default:
+            response.writeHead(404, "Invalid Route");
+            response.end("Route passed in does not exist");
+            break;
+        }
+      } else {
+        response.writeHead(404);
+        response.end(
+          "Route not found,try adding /products on /vendor/products"
+        );
+      }
+    } else if (urlSegment[0] == "admin") {
+      //To be done
+    } else if (urlSegment[0] == "feedback") FeedbackRoute(request, response);
+    else {
       response.writeHead(200, {
         "content-type": "text/html",
       });

@@ -1,4 +1,14 @@
 import * as mongoose from "mongoose";
+import { Middleware } from "./Middleware";
+
+export type Product = {
+  productid: string;
+  imageSource: string;
+  name: string;
+  category: string;
+  quantity: string;
+  stock: number;
+};
 
 export interface User {
   id: string;
@@ -7,8 +17,9 @@ export interface User {
   password?: string;
   goals?: string;
   biocoins: number;
+  cart: Product[];
 }
-console.log("hello wold");
+
 const Schema = new mongoose.Schema<User>({
   id: {
     type: mongoose.SchemaTypes.String,
@@ -30,6 +41,12 @@ const Schema = new mongoose.Schema<User>({
     type: mongoose.SchemaTypes.Number,
     required: true,
   },
+  cart: {
+    type: mongoose.SchemaTypes.Mixed,
+    required: true,
+  },
 });
+
+Middleware(Schema);
 
 export default mongoose.model("Users", Schema);

@@ -3,6 +3,7 @@ import { updateFunds } from "../Routes/CurrencyHandler";
 import { IncomingMessage, ServerResponse } from "http";
 import * as dotenv from "dotenv";
 import * as https from "https";
+import { time } from "console";
 
 dotenv.config({
   path: "./.env",
@@ -29,8 +30,6 @@ type PaymentResponse = {
     };
   };
 };
-
-console.log("hello wold");
 
 const consumerKey = process.env.MPESA_CKEY,
   consumerSecret = process.env.MPESA_CSECRET,
@@ -86,27 +85,12 @@ const Token = async (): Promise<any | Error> => {
       token = await Token(),
       currentDate = new Date(),
       timeStamp =
-        currentDate.getFullYear() +
-        "" +
-        (currentDate.getMonth() + 1 < 10
-          ? (currentDate.getMonth() + 1).toString().padStart(2, "0")
-          : currentDate.getMonth() + 1) +
-        "" +
-        (currentDate.getDate() < 10
-          ? currentDate.getDate().toString().padStart(2, "0")
-          : currentDate.getDate()) +
-        "" +
-        (currentDate.getHours() < 10
-          ? currentDate.getHours().toString().padStart(2, "0")
-          : currentDate.getHours()) +
-        "" +
-        +(currentDate.getMinutes() < 10
-          ? currentDate.getMinutes().toString().padStart(2, "0")
-          : currentDate.getMinutes()) +
-        "" +
-        (currentDate.getSeconds() < 10
-          ? currentDate.getSeconds().toString().padStart(2, "0")
-          : currentDate.getSeconds()),
+        currentDate.getFullYear().toString() +
+        (currentDate.getMonth() + 1).toString().padStart(2, "0") +
+        currentDate.getDate().toString().padStart(2, "0") +
+        currentDate.getHours().toString().padStart(2, "0") +
+        currentDate.getMinutes().toString().padStart(2, "0") +
+        currentDate.getSeconds().toString().padStart(2, "0"),
       password = Buffer.from(
         (((shortCode as string) + passKey) as string) + timeStamp
       ).toString("base64");

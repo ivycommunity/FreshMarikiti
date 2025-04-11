@@ -2,7 +2,20 @@ import { IncomingMessage, ServerResponse } from "http";
 import Products from "../Database/Products";
 import Users, { User } from "../Database/Users";
 import { retrieveUser } from "./AccountCRUD";
+import { type feedback } from "../Database/Feedback";
 import * as crypto from "crypto";
+
+type ProductUpdateBody = {
+  sellerid: string;
+  productid: string;
+  name?: string;
+  amount?: number;
+  desc?: string;
+  image?: string;
+  quantity?: number;
+  category?: string;
+  comments?: feedback[];
+};
 
 export const verifyUser = async (
   accessToken: string
@@ -16,8 +29,6 @@ export const verifyUser = async (
     else return "User doesn't exist in database";
   } else return "Token is either expired or non-existent";
 };
-
-console.log("hello wold");
 
 export const listProducts = async (
     request: IncomingMessage,
@@ -80,11 +91,12 @@ export const listProducts = async (
                 !itemInfo.sellerid ||
                 !itemInfo.seller ||
                 !itemInfo.phonenumber ||
+                !itemInfo.quantity ||
                 !itemInfo.amount
               ) {
                 response.writeHead(405);
                 response.end(
-                  "Incomplete body content, ensure to provide i.e. name, seller ID, seller, phonenumber, amount"
+                  "Incomplete body content, ensure to provide i.e. name, seller ID, seller, phonenumber, amount and quantity of the product required"
                 );
               } else {
                 try {
@@ -96,6 +108,7 @@ export const listProducts = async (
                     seller: itemInfo.seller,
                     phonenumber: itemInfo.phonenumber,
                     image: itemInfo.image ? itemInfo.image : "",
+                    quantity: itemInfo.quantity,
                     amount: itemInfo.amount,
                   });
                   response.writeHead(201);
@@ -142,13 +155,13 @@ export const listProducts = async (
         let User = await verifyUser(userToken as string);
 
         if (typeof User !== "string") {
-          let itemData: any = "";
+          let Data: any = "";
 
           request.on("data", (item: Buffer) => {
-            itemData += item.toString();
+            Data += item.toString();
           });
           request.on("end", async () => {
-            itemData = JSON.parse(itemData);
+            let itemData: ProductUpdateBody = JSON.parse(Data);
 
             if (User.id == itemData.sellerid) {
               if (!itemData.productid || !itemData.sellerid) {
@@ -207,7 +220,44 @@ export const listProducts = async (
                       { id: itemData.productid },
                       { image: value }
                     );
-                  }
+                  } else if (key == "quantity") {
+                    if ((value as number) < 0) {
+                      response.end("Invalid quantity, should be 0 or greater");
+                      return;
+                    }
+                    await Products.findOneAndUpdate(
+                      { id: itemData.productid },
+                      { quantity: value }
+                    );
+                  } else if (key == "category") {
+                    if (typeof value == "string" && value.length > 0) {
+                      await Products.findOneAndUpdate(
+                        {
+                          id: itemData.productid,
+                        },
+                        {
+                          category: value,
+                        }
+                      );
+                    }
+                  } else if (key == "comments") {
+                    if (Array.isArray(value)) {
+                      let comments: feedback[] = [];
+
+                      value.forEach((Comment: feedback) => {
+                        if (Comment.userid && Comment.comment) {
+                          comments.push(Comment);
+                        }
+                      });
+
+                      await Products.findOneAndUpdate(
+                        { id: itemData.productid },
+                        {
+                          comments: comments,
+                        }
+                      );
+                    }
+                  } else continue;
                 }
                 response.writeHead(201);
                 response.end("Update successful");
