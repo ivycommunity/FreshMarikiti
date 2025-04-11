@@ -34,11 +34,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => Subscriptionprovider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(
           create: (_) => ItemProvider(),
         ),
-        ChangeNotifierProvider(create: (_) => SplashProvider()),
       ],
       child: const Marikiti(),
     ),
@@ -50,7 +49,7 @@ class Marikiti extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeprovider = Provider.of<ThemeProvider>(context);
+    //final themeprovider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       supportedLocales: const [
         Locale('en', ''),
@@ -60,9 +59,9 @@ class Marikiti extends StatelessWidget {
         
           
       ],
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeprovider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      //themeMode: themeprovider.themeData,
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash_screen',
       routes: {

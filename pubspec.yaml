@@ -51,6 +51,7 @@ flutter:
     - assets/meat.jpeg
     - assets/avocado.jpeg
     - assets/milk.jpeg
+<<<<<<< HEAD
     - assets/cow_milk.png
     - assets/goat_milk.png
     - assets/ghee.png
@@ -62,5 +63,8 @@ flutter:
     - assets/lemon.jpeg
     - assets/orange.jpeg
     - .env  
+=======
+    
+>>>>>>> 84e2ea8ab4d610ad41a850c13f1bd85b09cccd8b
 
       
