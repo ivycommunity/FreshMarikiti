@@ -98,7 +98,7 @@ const DataStore: Validator = async (type, Data) => {
                 ? userData.goals
                 : ""
               : "",
-            cart: userData.cart,
+            cart: [],
             biocoins: 0,
           });
 
