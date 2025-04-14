@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc build",
     "dev": "node --watch ./Index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,7 @@
     "@types/follow-redirects": "^1.14.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.14",
-    "@types/simple-oauth2": "^5.0.7"
+    "@types/simple-oauth2": "^5.0.7",
+    "vitest": "^3.1.1"
   }
 }
