@@ -150,6 +150,7 @@ const server = http.createServer(
       }
     } else if (urlSegment[0] == "admin") {
       //To be done
+      response.end("Admin controls here");
     } else if (urlSegment[0] == "feedback") FeedbackRoute(request, response);
     else {
       response.writeHead(200, {
