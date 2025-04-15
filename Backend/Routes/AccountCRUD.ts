@@ -67,8 +67,8 @@ const DataStore: Validator = async (type, Data) => {
         if (!user) {
           return "Non-existent user";
         }
-        if (user.password) {
-          if (bcrypt.compareSync(userData.password, user.password) == false)
+        if (userData.password) {
+          if (bcrypt.compareSync(userData.password, userData.password) == false)
             return "Incorrect pass";
         }
 
