@@ -55,7 +55,8 @@ const DataStore: Validator = async (type, Data) => {
       if (type == "Login") {
         let userData: LoginCredentials = Data as LoginCredentials;
 
-        if (userData.email == undefined) return "Incomplete credentials";
+        if (userData.email == undefined || userData.password == undefined)
+          return "Incomplete credentials";
 
         const emailValidator: Boolean =
           /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gim.test(userData.email);
@@ -64,15 +65,13 @@ const DataStore: Validator = async (type, Data) => {
 
         let user = await UserSchema.findOne({ email: userData.email });
 
-        if (!user) {
-          return "Non-existent user";
-        }
-        if (userData.password) {
-          if (bcrypt.compareSync(userData.password, userData.password) == false)
-            return "Incorrect pass";
-        }
+        if (!user) return "Non-existent user";
 
-        return "Login successful";
+        if (user.google) return "Login successful";
+
+        if (bcrypt.compareSync(userData.password, userData.password) == false)
+          return "Incorrect pass";
+        else return "Login successful";
       } else {
         let userData: SignUpCredentials = Data as SignUpCredentials;
 
@@ -98,6 +97,7 @@ const DataStore: Validator = async (type, Data) => {
                 ? userData.goals
                 : ""
               : "",
+            google: false,
             cart: [],
             biocoins: 0,
           });
@@ -368,6 +368,7 @@ export const Signup = (
                           name: user.name,
                           email: user.email,
                           biocoins: 0,
+                          google: true,
                           cart: [],
                         });
                         response.writeHead(201);

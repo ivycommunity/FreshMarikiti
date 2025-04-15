@@ -15,6 +15,7 @@ export interface User {
   name: string;
   email: string;
   password?: string;
+  google: boolean;
   goals?: string;
   biocoins: number;
   cart: Product[];
@@ -39,6 +40,10 @@ const Schema = new mongoose.Schema<User>({
   },
   biocoins: {
     type: mongoose.SchemaTypes.Number,
+    required: true,
+  },
+  google: {
+    type: mongoose.SchemaTypes.Boolean,
     required: true,
   },
   cart: {
