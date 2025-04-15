@@ -44,8 +44,8 @@ export const listProducts = async (
         response.writeHead(200);
 
         if (sellerProducts.length > 0)
-          response.end(JSON.stringify(sellerProducts));
-        else response.end("No products found");
+          return response.end(JSON.stringify(sellerProducts));
+        else return response.end("No products found");
 
         return;
       } else {
@@ -92,9 +92,10 @@ export const listProducts = async (
                 !itemInfo.seller ||
                 !itemInfo.phonenumber ||
                 !itemInfo.quantity ||
-                !itemInfo.amount
+                !itemInfo.amount ||
+                !itemInfo.category
               ) {
-                response.writeHead(405);
+                response.writeHead(409);
                 response.end(
                   "Incomplete body content, ensure to provide i.e. name, seller ID, seller, phonenumber, amount and quantity of the product required"
                 );
@@ -109,12 +110,15 @@ export const listProducts = async (
                     phonenumber: itemInfo.phonenumber,
                     image: itemInfo.image ? itemInfo.image : "",
                     quantity: itemInfo.quantity,
+                    category: itemInfo.category,
+                    comments: [],
                     amount: itemInfo.amount,
                   });
                   response.writeHead(201);
                   response.end("Product added");
                   return;
                 } catch (error) {
+                  console.log(error);
                   response.writeHead(500);
                   response.end("Server error, please try again");
                   return;

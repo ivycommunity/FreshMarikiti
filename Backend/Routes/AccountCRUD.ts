@@ -8,6 +8,7 @@ import * as jwt from "jsonwebtoken";
 import * as crypto from "crypto";
 import * as bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
+import { isBuffer } from "util";
 
 dotenv.config({
   path: "./.env",
@@ -55,8 +56,7 @@ const DataStore: Validator = async (type, Data) => {
       if (type == "Login") {
         let userData: LoginCredentials = Data as LoginCredentials;
 
-        if (userData.email == undefined || userData.password == undefined)
-          return "Incomplete credentials";
+        if (userData.email == undefined) return "Incomplete credentials";
 
         const emailValidator: Boolean =
           /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gim.test(userData.email);
@@ -68,10 +68,11 @@ const DataStore: Validator = async (type, Data) => {
         if (!user) return "Non-existent user";
 
         if (user.google) return "Login successful";
-
-        if (bcrypt.compareSync(userData.password, userData.password) == false)
-          return "Incorrect pass";
-        else return "Login successful";
+        if (userData.password) {
+          if (bcrypt.compareSync(userData.password, userData.password) == false)
+            return "Incorrect pass";
+          else return "Login successful";
+        } else return "Incomplete credentials";
       } else {
         let userData: SignUpCredentials = Data as SignUpCredentials;
 
@@ -110,7 +111,7 @@ const DataStore: Validator = async (type, Data) => {
         } else
           return !emailValidator
             ? "Invalid email"
-            : passwordLength
+            : !passwordLength
             ? "Password short"
             : "Duplicate user";
       }
