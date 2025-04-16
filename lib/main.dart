@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:marikiti/Homepage.dart';
+import 'package:marikiti/Widgets/pages/homepage_2.dart';
 import 'package:marikiti/core/constants/View/auth/signup.dart';
 import 'package:marikiti/core/constants/View/auth/user_page.dart';
 import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
@@ -68,7 +69,8 @@ class Marikiti extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/': (context) => SignUpScreen(),
-        '/home': (context) => HomePage(),
+        //'/home': (context) => HomePage(),
+        '/home': (context) => HomePage2(),
       },
     );
   }
