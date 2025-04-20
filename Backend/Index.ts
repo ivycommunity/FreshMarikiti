@@ -26,7 +26,8 @@ dotenv.config({
 });
 
 const portNumber = process.env.PORT,
-  mongoUri = process.env.MONGO_URI;
+  mongoUri = process.env.MONGO_URI,
+  users: Record<string, string> = {};
 
 const server = http.createServer(
     async (
@@ -38,6 +39,8 @@ const server = http.createServer(
           `http://${request.headers.host}`
         ),
         urlSegment = url.pathname.split("/").filter(Boolean);
+
+      if (request.url?.startsWith("/socket.io")) return;
 
       if (urlSegment[0] == "accounts") {
         switch (urlSegment[1]) {
@@ -160,17 +163,36 @@ const server = http.createServer(
         response.writeHead(200, {
           "content-type": "text/html",
         });
-        response.end("Index route to Fresh Marikiti Application");
+        response.end("Fresh Marikiti server application, index route");
       }
     }
   ),
-  io = new Server(server);
+  io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    },
+  });
 
 io.on("connection", (socket: Socket) => {
-  console.log("User connected");
+  console.log("User connected", socket.id);
 
-  io.on("disconnect", () => {
+  socket.on("send-chat-message", (message) => {
+    socket.broadcast.emit("chat-message", {
+      message: message,
+      name: users[socket.id],
+    });
+  });
+
+  socket.on("new-user", (name: string) => {
+    users[socket.id] = name;
+    socket.broadcast.emit("user-connected", name);
+  });
+
+  socket.on("disconnect", () => {
     console.log("User disconnected");
+    socket.broadcast.emit("user-disconnected", users[socket.id]);
+    delete users[socket.id];
   });
 });
 
