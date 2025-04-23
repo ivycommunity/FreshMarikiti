@@ -6,19 +6,22 @@
   "scripts": {
     "build": "tsc build",
     "dev": "node --watch ./Index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "So far covers the essentials for users i.e.:",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
     "follow-redirects": "^1.15.9",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.15.0",
     "mongoose": "^8.13.1",
     "simple-oauth2": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   },
@@ -29,6 +32,7 @@
     "@types/follow-redirects": "^1.14.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.14",
-    "@types/simple-oauth2": "^5.0.7"
+    "@types/simple-oauth2": "^5.0.7",
+    "vitest": "^3.1.1"
   }
 }

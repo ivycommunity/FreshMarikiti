@@ -1,3 +1,10 @@
+# Merge fix
+
 /node_modules
 /.env
-/**/*.js
+
+/Routes/*.js
+/M-Pesa/*.js
+/Database/*.js
+/Testing/**/*.js
+/*.js

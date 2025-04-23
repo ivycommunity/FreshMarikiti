@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Middleware } from "./Middleware";
 
 export interface Product {
   id: string;
@@ -7,8 +8,11 @@ export interface Product {
   sellerid: string;
   phonenumber: string;
   description?: string;
+  quantity: number;
   image?: string;
   amount: number;
+  category: string;
+  comments: any[];
 }
 
 const Schema = new mongoose.Schema<Product>({
@@ -28,6 +32,10 @@ const Schema = new mongoose.Schema<Product>({
     type: mongoose.SchemaTypes.String,
     required: true,
   },
+  quantity: {
+    type: mongoose.SchemaTypes.Number,
+    required: true,
+  },
   phonenumber: {
     type: mongoose.SchemaTypes.String,
     required: true,
@@ -44,6 +52,16 @@ const Schema = new mongoose.Schema<Product>({
     type: mongoose.SchemaTypes.Number,
     required: true,
   },
+  category: {
+    type: mongoose.SchemaTypes.String,
+    required: true,
+  },
+  comments: {
+    type: mongoose.SchemaTypes.Mixed,
+    required: true,
+  },
 });
+
+Middleware(Schema);
 
 export default mongoose.model("Products", Schema);

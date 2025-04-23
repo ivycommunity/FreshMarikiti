@@ -18,143 +18,183 @@ import {
   deleteProduct,
 } from "./Routes/ProductsHandler";
 import { Transact } from "./Routes/CurrencyHandler";
+import { FeedbackRoute } from "./Routes/FeedbackHandler";
+import { Socket, Server } from "socket.io";
 
 dotenv.config({
   path: "./.env",
 });
 
 const portNumber = process.env.PORT,
-  mongoUri = process.env.MONGO_URI;
+  mongoUri = process.env.MONGO_URI,
+  users: Record<string, string> = {};
 
 const server = http.createServer(
-  async (
-    request: http.IncomingMessage,
-    response: http.ServerResponse<http.IncomingMessage>
-  ) => {
-    let url = new URL(request.url as string, `http://${request.headers.host}`),
-      urlSegment = url.pathname.split("/").filter(Boolean);
+    async (
+      request: http.IncomingMessage,
+      response: http.ServerResponse<http.IncomingMessage>
+    ) => {
+      let url = new URL(
+          request.url as string,
+          `http://${request.headers.host}`
+        ),
+        urlSegment = url.pathname.split("/").filter(Boolean);
 
-    if (urlSegment[0] == "accounts") {
-      switch (urlSegment[1]) {
-        case "user":
-          let userToken = request.headers["user_access_token"];
+      if (request.url?.startsWith("/socket.io")) return;
 
-          if (userToken) {
-            let user = await retrieveUser(userToken as string);
+      if (urlSegment[0] == "accounts") {
+        switch (urlSegment[1]) {
+          case "user":
+            let userToken = request.headers["user-token"];
 
-            if (user) response.end(JSON.stringify(user));
-            else response.end("Access token expired, refresh");
-          } else {
-            response.writeHead(401, "Non-authentication");
-            response.end(
-              "Unauthenticated user, authenticate yourself first, required headers "
-            );
+            if (userToken) {
+              let user = await retrieveUser(userToken as string);
+
+              if (user) response.end(JSON.stringify(user));
+              else response.end("Access token expired, refresh");
+            } else {
+              response.writeHead(401, "Non-authentication");
+              response.end(
+                "Unauthenticated user, authenticate yourself first, required headers "
+              );
+            }
+            break;
+          case "login":
+            if (request.method == "POST") Login(request, response);
+            else {
+              response.writeHead(405);
+              response.end(
+                "Invalid http method passed in for this route, pass in a POST method"
+              );
+            }
+            break;
+          case "signup":
+            if (request.method == "POST") Signup(request, response);
+            else {
+              response.writeHead(405);
+              response.end(
+                "Invalid http method passed in for this route, pass in a POST method"
+              );
+            }
+            break;
+          case "googleoauth":
+            googleAuthentication(response);
+            break;
+          case "googleredirect":
+            googleUserToken(request, response);
+            break;
+          case "update":
+            if (request.method == "PUT") Update(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Update route, use a put method instead");
+            }
+            break;
+          case "delete":
+            if (request.method == "DELETE") Delete(request, response);
+            else {
+              response.writeHead(405);
+              response.end("Invalid http method, try DELETE next time.");
+            }
+            break;
+          default:
+            response.writeHead(404, { location: "/user" });
+            break;
+        }
+      } else if (urlSegment[0] == "payments") {
+        switch (urlSegment[1]) {
+          case "process":
+            Payment(request, response);
+            break;
+          case "redirect":
+            Redirect(request, response);
+            break;
+          case "transact":
+            Transact(request, response);
+            break;
+          default:
+            response.writeHead(404, "Invalid Route");
+            response.end("Route passed in does not exist");
+            break;
+        }
+      } else if (urlSegment[0] == "vendor") {
+        if (urlSegment[1] == "products") {
+          switch (urlSegment[2]) {
+            case "list":
+              listProducts(request, response);
+              break;
+            case "add":
+              if (request.method == "POST") addProduct(request, response);
+              else {
+                response.writeHead(405);
+                response.end("Invalid http method, use POST instead");
+              }
+              break;
+            case "update":
+              if (request.method == "PUT") updateProduct(request, response);
+              else {
+                response.writeHead(405);
+                response.end("Invalid http method, use PUT instead");
+              }
+              break;
+            case "delete":
+              if (request.method == "DELETE") deleteProduct(request, response);
+              else {
+                response.writeHead(405);
+                response.end("Invalid http method, use DELETE instead");
+              }
+              break;
+            default:
+              response.writeHead(404, "Invalid Route");
+              response.end("Route passed in does not exist");
+              break;
           }
-          break;
-        case "login":
-          if (request.method == "POST") Login(request, response);
-          else {
-            response.writeHead(405);
-            response.end(
-              "Invalid http method passed in for this route, pass in a POST method"
-            );
-          }
-          break;
-        case "signup":
-          if (request.method == "POST") Signup(request, response);
-          else {
-            response.writeHead(405);
-            response.end(
-              "Invalid http method passed in for this route, pass in a POST method"
-            );
-          }
-          break;
-        case "googleoauth":
-          googleAuthentication(response);
-          break;
-        case "googleredirect":
-          googleUserToken(request, response);
-          break;
-        case "googlefail":
-          response.end("Google Oauth rejected");
-          break;
-        case "update":
-          if (request.method == "PUT") Update(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Update route, use a put method instead");
-          }
-          break;
-        case "delete":
-          if (request.method == "DELETE") Delete(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, try DELETE next time.");
-          }
-          break;
-        default:
-          response.writeHead(404, { location: "/user" });
-          break;
+        } else {
+          response.writeHead(404);
+          response.end(
+            "Route not found,try adding /products on /vendor/products"
+          );
+        }
+      } else if (urlSegment[0] == "admin") {
+        //To be done
+        response.end("Admin controls here");
+      } else if (urlSegment[0] == "feedback") FeedbackRoute(request, response);
+      else {
+        response.writeHead(200, {
+          "content-type": "text/html",
+        });
+        response.end("Fresh Marikiti server application, index route");
       }
-    } else if (urlSegment[0] == "payments") {
-      switch (urlSegment[1]) {
-        case "process":
-          Payment(request, response);
-          break;
-        case "redirect":
-          Redirect(request, response);
-          break;
-        default:
-          response.writeHead(404, "Invalid Route");
-          response.end("Route passed in does not exist");
-          break;
-      }
-    } else if (urlSegment[0] == "products") {
-      switch (urlSegment[1]) {
-        case "list":
-          listProducts(request, response);
-          break;
-        case "add":
-          if (request.method == "POST") addProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use POST instead");
-          }
-          break;
-        case "update":
-          if (request.method == "PUT") updateProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use PUT instead");
-          }
-          break;
-        case "delete":
-          if (request.method == "DELETE") deleteProduct(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
-          break;
-        case "purchase":
-          if (request.method == "POST") Transact(request, response);
-          else {
-            response.writeHead(405);
-            response.end("Invalid http method, use DELETE instead");
-          }
-          break;
-        default:
-          response.writeHead(404, "Invalid Route");
-          response.end("Route passed in does not exist");
-          break;
-      }
-    } else {
-      response.writeHead(200, {
-        "content-type": "text/html",
-      });
-      response.end("Index route to Fresh Marikiti Application");
     }
-  }
-);
+  ),
+  io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    },
+  });
+
+io.on("connection", (socket: Socket) => {
+  console.log("User connected", socket.id);
+
+  socket.on("send-chat-message", (message) => {
+    socket.broadcast.emit("chat-message", {
+      message: message,
+      name: users[socket.id],
+    });
+  });
+
+  socket.on("new-user", (name: string) => {
+    users[socket.id] = name;
+    socket.broadcast.emit("user-connected", name);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+    socket.broadcast.emit("user-disconnected", users[socket.id]);
+    delete users[socket.id];
+  });
+});
 
 server.listen(portNumber, async () => {
   mongoose

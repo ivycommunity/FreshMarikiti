@@ -4,10 +4,13 @@ import { IncomingMessage, ServerResponse } from "http";
 import { verifyUser } from "./ProductsHandler";
 import Products from "../Database/Products";
 
-type Transacters = {
+export type Transacters = {
   buyerid: string;
   sellerid: string;
   productid: string;
+};
+type Transactions = {
+  Transactions: Transacters[] | Transacters;
 };
 
 //Update funds --> Adds bioCoins
@@ -50,43 +53,121 @@ export const updateFunds = async (
         transaction += data.toString();
       });
       request.on("end", async () => {
-        let transacters: Transacters = JSON.parse(transaction);
+        let transacters: Transactions = JSON.parse(transaction);
 
-        if (
-          transacters.buyerid &&
-          transacters.sellerid &&
-          transacters.productid
-        ) {
-          let productFinder = await Products.findOne({
-              id: transacters.productid,
-            }),
-            buyer = await Users.findOne({ id: transacters.buyerid }),
-            seller = await Users.findOne({ id: transacters.sellerid });
+        if (transacters && Array.isArray(transacters.Transactions)) {
+          transacters.Transactions.forEach(async (Transaction) => {
+            try {
+              let productFinder = await Products.findOne({
+                  id: Transaction.productid,
+                }),
+                buyer = await Users.findOne({ id: Transaction.buyerid }),
+                seller = await Users.findOne({ id: Transaction.sellerid });
 
-          if (productFinder) {
-            if (buyer && seller) {
-              if (buyer.biocoins < productFinder.amount) {
-                response.writeHead(402);
-                response.end();
+              if (productFinder) {
+                if (buyer && seller) {
+                  if (productFinder.sellerid == seller.id) {
+                    if (buyer.id != seller.id) {
+                      if (buyer.biocoins < productFinder.amount) {
+                        response.writeHead(402);
+                        response.end("Buyer has insufficient funds");
+                      } else {
+                        await buyer.updateOne({
+                          biocoins: buyer.biocoins - productFinder.amount,
+                        });
+                        await seller.updateOne({
+                          biocoins: seller.biocoins + productFinder.amount,
+                        });
+                        response.writeHead(200, "Succesful purchase", {
+                          "content-type": "application/json",
+                        });
+                        response.end(transacters);
+                      }
+                    } else {
+                      response.writeHead(409);
+                      response.end("Seller cannot sell to himself lollol😂");
+                    }
+                  } else {
+                    response.writeHead(409);
+                    response.end("Seller does not have such a product in sale");
+                  }
+                } else {
+                  response.writeHead(404);
+                  response.end("No such user exists");
+                  return;
+                }
               } else {
-                await buyer.updateOne({
-                  biocoins: buyer.biocoins - productFinder.amount,
-                });
-                await seller.updateOne({
-                  biocoins: seller.biocoins + productFinder.amount,
-                });
+                response.writeHead(404);
+                response.end("No such product exists");
+                return;
+              }
+            } catch (error: any) {
+              if (
+                (error as Error).message.includes("timed out") ||
+                (error as Error).name.includes("timed out")
+              ) {
+                response.writeHead(500);
+                response.end("Database connection timed out please try again");
+              }
+            }
+          });
+        } else {
+          try {
+            let productFinder = await Products.findOne({
+                id: (transacters.Transactions as Transacters).productid,
+              }),
+              buyer = await Users.findOne({
+                id: (transacters.Transactions as Transacters).buyerid,
+              }),
+              seller = await Users.findOne({
+                id: (transacters.Transactions as Transacters).sellerid,
+              });
+
+            if (productFinder) {
+              if (buyer && seller) {
+                if (productFinder.sellerid == seller.id) {
+                  if (buyer.id != seller.id) {
+                    if (buyer.biocoins < productFinder.amount) {
+                      response.writeHead(402);
+                      response.end("Buyer has insufficient funds");
+                    } else {
+                      await buyer.updateOne({
+                        biocoins: buyer.biocoins - productFinder.amount,
+                      });
+                      await seller.updateOne({
+                        biocoins: seller.biocoins + productFinder.amount,
+                      });
+                      response.writeHead(200, "Succesful purchase", {
+                        "content-type": "text/plain",
+                      });
+                      response.end(transacters);
+                    }
+                  } else {
+                    response.writeHead(409);
+                    response.end("Seller cannot sell to himself lollol😂");
+                  }
+                } else {
+                  response.writeHead(409);
+                  response.end("Seller does not have such a product in sale");
+                }
+              } else {
+                response.writeHead(404);
+                response.end("No such user exists");
+                return;
               }
             } else {
               response.writeHead(404);
-              response.end("No such user exists");
+              response.end("No such product exists");
               return;
             }
-          } else {
-            response.writeHead(404);
-            response.end("No such product exists");
-            return;
+          } catch (error) {
+            response.writeHead(500);
+            response.end("Error in completing the transaction");
           }
         }
       });
+    } else {
+      response.writeHead(403);
+      response.end("Unauthorized user, authenticate yourself");
     }
   };
