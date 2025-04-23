@@ -58,8 +58,8 @@ class HomePage2 extends StatelessWidget {
             OrdersTab(),
 
             // Content for "Rating" tab
-            Center(child: Text("Rating Content"),
-            RatingTab(),),
+            Center(child: Text("Rating Content"),),
+            RatingTab(),
           ],
         ),
         floatingActionButton: FloatingActionButton(
