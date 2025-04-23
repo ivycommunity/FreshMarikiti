@@ -3,7 +3,7 @@ import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/splash_screen.dart';
 
 
-import 'package:marikiti/Homepage.dart';
+import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/pages/homepage_2.dart';
 // =======
 // import 'package:marikiti/core/constants/providers/product_provider.dart';
