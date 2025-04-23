@@ -72,8 +72,8 @@ class Marikiti extends StatelessWidget {
       routes: {
         '/': (context) => SignUpScreen(),
 
-        //'/home': (context) => HomePage(),
-        '/home': (context) => HomePage2(),
+        '/home': (context) => HomePage(),
+        '/home2': (context) => HomePage2(),
 // =======
 //         '/home': (context) => HomePage(),
 //         '/splash_screen': (context) => SplashScreen()
