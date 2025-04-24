@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "772321937173",
+    "project_id": "sokoni-ceead",
+    "storage_bucket": "sokoni-ceead.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772321937173:android:c3c2635de0aa061b1f4b1c",
+        "android_client_info": {
+          "package_name": "com.example.sokoni"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-PjHCBZjc8dIJfb4nD1kMWpigm4P5BMU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
