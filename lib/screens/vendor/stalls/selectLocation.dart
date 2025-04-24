@@ -6,8 +6,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 
-const String kGoogleApiKey = 'AIzaSyC7ADEcI97QuDeYyqmfA5pwtOHy-Erh4zE';
-
 class SelectLocationPage extends StatefulWidget {
   const SelectLocationPage({super.key});
 
