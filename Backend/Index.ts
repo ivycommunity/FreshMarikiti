@@ -177,12 +177,32 @@ const server = http.createServer(
 io.on("connection", (socket: Socket) => {
   console.log("User connected", socket.id);
 
-  socket.on("send-chat-message", (message) => {
+  const socketsMap = io.of("/").sockets;
+  let usersConnected: any[] = [];
+
+  socketsMap.forEach((socket, id) => {
+    console.log(id + " : " + socket.id);
+    usersConnected.push({
+      userId: id,
+    });
+  });
+  socket.emit("users", usersConnected);
+  socket.on("send-chat-message", (message: string) => {
     socket.broadcast.emit("chat-message", {
       message: message,
       name: users[socket.id],
     });
   });
+
+  socket.on(
+    "private-message",
+    ({ content, to }: { content: string; to: string }) => {
+      socket.to(to).emit("private-message", {
+        content,
+        from: socket.id,
+      });
+    }
+  );
 
   socket.on("new-user", (name: string) => {
     users[socket.id] = name;
