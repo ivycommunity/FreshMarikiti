@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/splash_screen.dart';
 
-import 'package:marikiti/core/constants/providers/product_provider.dart';
-import 'package:marikiti/core/constants/providers/splash_provider.dart';
+
+import 'package:marikiti/homepage.dart';
+import 'package:marikiti/Widgets/pages/homepage_2.dart';
+// =======
+// import 'package:marikiti/core/constants/providers/product_provider.dart';
+// import 'package:marikiti/core/constants/providers/splash_provider.dart';
+// >>>>>>> main
 import 'package:marikiti/core/constants/View/auth/signup.dart';
 import 'package:marikiti/core/constants/providers/Checkoutprovider.dart';
 import 'package:marikiti/core/constants/providers/Subscriptionprovider.dart';
@@ -66,8 +71,13 @@ class Marikiti extends StatelessWidget {
       initialRoute: '/splash_screen',
       routes: {
         '/': (context) => SignUpScreen(),
+
         '/home': (context) => HomePage(),
-        '/splash_screen': (context) => SplashScreen()
+        '/home2': (context) => HomePage2(),
+// =======
+//         '/home': (context) => HomePage(),
+//         '/splash_screen': (context) => SplashScreen()
+// >>>>>>> main
       },
     );
   }
