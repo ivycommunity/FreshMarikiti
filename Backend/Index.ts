@@ -181,9 +181,22 @@ io.on("connection", (socket: Socket) => {
   socketsMap.forEach((socket, id) => {
     usersConnected.push({
       userId: id,
+      name: users[id] || "Unknown",
     });
   });
-  socket.emit("users", usersConnected);
+  socket.on(
+    "new-user,userName",
+    ({ userId, username }: { userId: string; username: string }) => {
+      users[userId] = username;
+      io.emit(
+        "users",
+        Object.entries(users).map(([id, name]) => ({
+          userId: userId,
+          name: username,
+        }))
+      );
+    }
+  );
   socket.on("send-chat-message", (message: string) => {
     socket.broadcast.emit("chat-message", {
       message: message,
@@ -201,14 +214,17 @@ io.on("connection", (socket: Socket) => {
     }
   );
 
-  socket.on("new-user", (name: string) => {
-    users[socket.id] = name;
-    socket.broadcast.emit("user-connected", name);
-  });
-
   socket.on("disconnect", () => {
     socket.broadcast.emit("user-disconnected", users[socket.id]);
     delete users[socket.id];
+    delete users[socket.id];
+    io.emit(
+      "users",
+      Object.entries(users).map(([id, name]) => ({
+        userId: id,
+        name,
+      }))
+    );
   });
 });
 
