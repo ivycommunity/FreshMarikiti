@@ -175,13 +175,10 @@ const server = http.createServer(
   });
 
 io.on("connection", (socket: Socket) => {
-  console.log("User connected", socket.id);
-
   const socketsMap = io.of("/").sockets;
   let usersConnected: any[] = [];
 
   socketsMap.forEach((socket, id) => {
-    console.log(id + " : " + socket.id);
     usersConnected.push({
       userId: id,
     });
@@ -210,7 +207,6 @@ io.on("connection", (socket: Socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
     socket.broadcast.emit("user-disconnected", users[socket.id]);
     delete users[socket.id];
   });
