@@ -174,57 +174,48 @@ const server = http.createServer(
     },
   });
 
+io.use((socket, next) => {
+  const username = socket.handshake.auth.userName;
+
+  if (!username) console.log("Does not exist");
+
+  socket.username = username;
+  next();
+});
+
 io.on("connection", (socket: Socket) => {
   const socketsMap = io.of("/").sockets;
-  let usersConnected: any[] = [];
+  let usersPresent: Record<string, string>[] = [];
 
-  socketsMap.forEach((socket, id) => {
-    usersConnected.push({
-      userId: id,
-      name: users[id] || "Unknown",
-    });
+  socket.broadcast.emit("user-connected", {
+    id: socket.id,
+    username: socket.username,
   });
-  socket.on(
-    "new-user,userName",
-    ({ userId, username }: { userId: string; username: string }) => {
-      users[userId] = username;
-      io.emit(
-        "users",
-        Object.entries(users).map(([id, name]) => ({
-          userId: userId,
-          name: username,
-        }))
-      );
-    }
-  );
-  socket.on("send-chat-message", (message: string) => {
-    socket.broadcast.emit("chat-message", {
-      message: message,
-      name: users[socket.id],
+
+  socketsMap.forEach((socket, socketId) => {
+    usersPresent.push({
+      id: socketId,
+      username: socket.username as string,
     });
   });
 
-  socket.on(
-    "private-message",
-    ({ content, to }: { content: string; to: string }) => {
-      socket.to(to).emit("private-message", {
-        content,
-        from: socket.id,
-      });
-    }
-  );
+  socket.emit("users", usersPresent);
+
+  socket.onAny((events, ...args) => {
+    console.log(events, args);
+  });
+
+  socket.on("private message", ({ content, to }) => {
+    socket.to(to).emit("private message", {
+      content,
+      from: socket.id,
+    });
+  });
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("user-disconnected", users[socket.id]);
     delete users[socket.id];
     delete users[socket.id];
-    io.emit(
-      "users",
-      Object.entries(users).map(([id, name]) => ({
-        userId: id,
-        name,
-      }))
-    );
   });
 });
 
