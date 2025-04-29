@@ -69,7 +69,10 @@ const DataStore: Validator = async (type, Data) => {
 
         if (user.google) return "Login successful";
         if (userData.password) {
-          if (bcrypt.compareSync(userData.password, userData.password) == false)
+          if (
+            bcrypt.compareSync(user.password as string, userData.password) ==
+            false
+          )
             return "Incorrect pass";
           else return "Login successful";
         } else return "Incomplete credentials";
