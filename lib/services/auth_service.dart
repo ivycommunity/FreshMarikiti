@@ -32,6 +32,7 @@ class AuthService {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
+      print(res.body);
       httpErrorHandle(
         response: res,
         context: context,
@@ -42,6 +43,7 @@ class AuthService {
       );
     } catch (e) {
       showSnackBar(context, e.toString());
+      print(e.toString());
     }
   }
 
@@ -65,9 +67,12 @@ class AuthService {
           onSuccess: () async {
             // storing the token
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            userProvider.setUser(res.body);
             await prefs.setString(
-                'x-auth-token', jsonDecode(res.body)['access-token']);
+                'x-auth-token', jsonDecode(res.body)['accessToken']);
+            // var resBody = jsonDecode(res.body);
+            // print("RESPONSE HERE: $resBody, ${resBody['accessToken']}");
+
+
             navigator.pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomePage()),
               (route) => false,

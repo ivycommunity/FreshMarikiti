@@ -15,6 +15,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   
+  font_awesome_flutter: ^10.8.0
   google_sign_in: ^6.2.2
   google_sign_in_all_platforms: ^1.1.0
   http: ^1.3.0
@@ -51,7 +52,7 @@ flutter:
     - assets/meat.jpeg
     - assets/avocado.jpeg
     - assets/milk.jpeg
-<<<<<<< HEAD
+#<<<<<<< HEAD
     - assets/cow_milk.png
     - assets/goat_milk.png
     - assets/ghee.png
@@ -63,8 +64,8 @@ flutter:
     - assets/lemon.jpeg
     - assets/orange.jpeg
     - .env  
-=======
+#=======
     
->>>>>>> 84e2ea8ab4d610ad41a850c13f1bd85b09cccd8b
+#>>>>>>> 84e2ea8ab4d610ad41a850c13f1bd85b09cccd8b
 
       

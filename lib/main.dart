@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/core/constants/providers/splash_provider.dart';
 import 'package:marikiti/homepage.dart';
 import 'package:marikiti/Widgets/splash_screen.dart';
 
@@ -40,6 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => Subscriptionprovider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => SplashProvider()),
         ChangeNotifierProvider(
           create: (_) => ItemProvider(),
         ),
@@ -69,8 +71,10 @@ class Marikiti extends StatelessWidget {
       //themeMode: themeprovider.themeData,
       debugShowCheckedModeBanner: false,
       initialRoute: '/splash_screen',
+      // initialRoute: '/',
       routes: {
         '/': (context) => SignUpScreen(),
+        '/splash_screen': (context) => SplashScreen(),
 
         '/home': (context) => HomePage(),
         '/home2': (context) => HomePage2(),

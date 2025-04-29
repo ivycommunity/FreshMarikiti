@@ -136,146 +136,156 @@ export const Signup = (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>
   ) => {
-    let userData: any = "";
+    try {
+      let userData: any = "";
 
-    request.on("data", (data: Buffer) => {
-      if (data) userData += data.toString();
-    });
-    request.on("close", async () => {
-      if (userData.length > 0) {
-        const signup = await DataStore("Signup", JSON.parse(userData));
+      request.on("data", (data: Buffer) => {
+        if (data) userData += data.toString();
+      });
+      request.on("close", async () => {
+        if (userData.length > 0) {
+          const signup = await DataStore("Signup", JSON.parse(userData));
 
-        if (signup == "Successful signup") {
-          userData = JSON.parse(userData);
-          let userDetails = await UserSchema.findOne({ email: userData.email });
-
-          let user = await generateUserToken({
-            id: userDetails?.id,
-            name: userData.name,
-            email: userData.email,
-            biocoins: userDetails?.biocoins,
-            goals: userDetails?.goals,
-            cart: userDetails?.cart,
-          });
-
-          if (user instanceof Error == false) {
-            response.writeHead(201, "Successful signup", {
-              "content-type": "text/plain",
+          if (signup == "Successful signup") {
+            userData = JSON.parse(userData);
+            let userDetails = await UserSchema.findOne({
+              email: userData.email,
             });
-            response.end(
-              JSON.stringify({
-                accessToken: user.accessToken,
-              })
-            );
+
+            let user = await generateUserToken({
+              id: userDetails?.id,
+              name: userData.name,
+              email: userData.email,
+              biocoins: userDetails?.biocoins,
+              goals: userDetails?.goals,
+              cart: userDetails?.cart,
+            });
+
+            if (user instanceof Error == false) {
+              response.writeHead(201, "Successful signup", {
+                "content-type": "text/plain",
+              });
+              response.end(
+                JSON.stringify({
+                  accessToken: user.accessToken,
+                })
+              );
+            }
+          } else {
+            switch (signup) {
+              case "Incomplete credentials":
+                response.writeHead(401, "Incomplete Credentials");
+                response.end(
+                  "Incomplete credentials, provide name,email and password"
+                );
+                break;
+              case "Invalid email":
+                response.writeHead(401, "Email Format");
+                response.end(
+                  "Invalid email passed in, ensure email has the correct format"
+                );
+                break;
+              case "Password short":
+                response.writeHead(401, "Password Length");
+                response.end("Password length is short");
+                break;
+              case "Duplicate user":
+                response.writeHead(409);
+                response.end("Duplicate user, email already exists");
+                break;
+              default:
+                response.writeHead(500, "Server failure");
+                response.end("Server failure, please try again");
+                break;
+            }
           }
         } else {
-          switch (signup) {
-            case "Incomplete credentials":
-              response.writeHead(401, "Incomplete Credentials");
-              response.end(
-                "Incomplete credentials, provide name,email and password"
-              );
-              break;
-            case "Invalid email":
-              response.writeHead(401, "Email Format");
-              response.end(
-                "Invalid email passed in, ensure email has the correct format"
-              );
-              break;
-            case "Password short":
-              response.writeHead(401, "Password Length");
-              response.end("Password length is short");
-              break;
-            case "Duplicate user":
-              response.writeHead(409);
-              response.end("Duplicate user, email already exists");
-              break;
-            default:
-              response.writeHead(500, "Server failure");
-              response.end("Server failure, please try again");
-              break;
-          }
+          response.writeHead(401, "Invalid body Content", {
+            "content-type": "text/plain",
+          });
+          response.end("Pass in a body");
         }
-      } else {
-        response.writeHead(401, "Invalid body Content", {
-          "content-type": "text/plain",
-        });
-        response.end("Pass in a body");
-      }
-    });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   },
   Login = (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>
   ) => {
-    let userData: any = "";
+    try {
+      let userData: any = "";
 
-    request.on("data", (data: Buffer) => {
-      if (data) userData += data.toString();
-    });
-    request.on("end", async () => {
-      if (userData) {
-        const login = await DataStore("Login", JSON.parse(userData));
+      request.on("data", (data: Buffer) => {
+        if (data) userData += data.toString();
+      });
+      request.on("end", async () => {
+        if (userData) {
+          const login = await DataStore("Login", JSON.parse(userData));
 
-        if (login == "Login successful") {
-          let user = JSON.parse(userData),
-            userDetails = await UserSchema.findOne({ email: user.email });
+          if (login == "Login successful") {
+            let user = JSON.parse(userData),
+              userDetails = await UserSchema.findOne({ email: user.email });
 
-          if (userDetails) {
-            let encodedUser = await generateUserToken({
-              id: userDetails.id,
-              name: userDetails.name,
-              email: userDetails.email,
-              biocoins: userDetails.biocoins,
-              goals: userDetails.goals,
-              cart: userDetails.cart,
-            });
+            if (userDetails) {
+              let encodedUser = await generateUserToken({
+                id: userDetails.id,
+                name: userDetails.name,
+                email: userDetails.email,
+                biocoins: userDetails.biocoins,
+                goals: userDetails.goals,
+                cart: userDetails.cart,
+              });
 
-            if (encodedUser instanceof Error == false) {
-              response.writeHead(200, "Successful Login");
-              response.end(
-                JSON.stringify({
-                  accessToken: encodedUser.accessToken,
-                })
-              );
-              return;
-            } else {
-              response.writeHead(500);
-              response.end("Server error, please try again");
-              return;
+              if (encodedUser instanceof Error == false) {
+                response.writeHead(200, "Successful Login");
+                response.end(
+                  JSON.stringify({
+                    accessToken: encodedUser.accessToken,
+                  })
+                );
+                return;
+              } else {
+                response.writeHead(500);
+                response.end("Server error, please try again");
+                return;
+              }
+            }
+          } else {
+            switch (login) {
+              case "Non-existent user":
+                response.writeHead(404, "User does not exist");
+                response.end("User doesn't exist");
+                break;
+              case "Incorrect pass":
+                response.writeHead(401, "Incorrect pass");
+                response.end("Incorrect password passed");
+                break;
+              case "Incomplete credentials":
+                response.writeHead(401, "Incomplete Credentials");
+                response.end("Provide all credentials i.e. email and password");
+                break;
+              case "Invalid email":
+                response.writeHead(400, "Email format");
+                response.end("Invalid email format");
+                break;
+              default:
+                response.writeHead(500, "Server error");
+                response.end("Server error occured, please try again");
+                break;
             }
           }
         } else {
-          switch (login) {
-            case "Non-existent user":
-              response.writeHead(404, "User does not exist");
-              response.end("User doesn't exist");
-              break;
-            case "Incorrect pass":
-              response.writeHead(401, "Incorrect pass");
-              response.end("Incorrect password passed");
-              break;
-            case "Incomplete credentials":
-              response.writeHead(401, "Incomplete Credentials");
-              response.end("Provide all credentials i.e. email and password");
-              break;
-            case "Invalid email":
-              response.writeHead(400, "Email format");
-              response.end("Invalid email format");
-              break;
-            default:
-              response.writeHead(500, "Server error");
-              response.end("Server error occured, please try again");
-              break;
-          }
+          response.writeHead(401, "No body Content", {
+            "content-type": "text/plain",
+          });
+          response.end("Pass in a body");
         }
-      } else {
-        response.writeHead(401, "No body Content", {
-          "content-type": "text/plain",
-        });
-        response.end("Pass in a body");
-      }
-    });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   },
   googleAuthentication = async (response: ServerResponse<IncomingMessage>) => {
     const authUrl = `${googleAuthURL}?client_id=${googleID}&redirect_uri=${encodeURIComponent(
