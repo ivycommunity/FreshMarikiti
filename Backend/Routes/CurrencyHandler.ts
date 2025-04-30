@@ -8,6 +8,7 @@ export type Transacters = {
   buyerid: string;
   sellerid: string;
   productid: string;
+  quantity: number;
 };
 type Transactions = {
   Transactions: Transacters[] | Transacters;
@@ -68,15 +69,26 @@ export const updateFunds = async (
                 if (buyer && seller) {
                   if (productFinder.sellerid == seller.id) {
                     if (buyer.id != seller.id) {
-                      if (buyer.biocoins < productFinder.amount) {
+                      if (
+                        buyer.biocoins <
+                        productFinder.amount * Transaction.quantity
+                      ) {
                         response.writeHead(402);
                         response.end("Buyer has insufficient funds");
                       } else {
                         await buyer.updateOne({
-                          biocoins: buyer.biocoins - productFinder.amount,
+                          biocoins:
+                            buyer.biocoins -
+                            productFinder.amount * Transaction.quantity,
                         });
                         await seller.updateOne({
-                          biocoins: seller.biocoins + productFinder.amount,
+                          biocoins:
+                            seller.biocoins +
+                            productFinder.amount * Transaction.quantity,
+                        });
+                        await productFinder.updateOne({
+                          quantity:
+                            productFinder.quantity - Transaction.quantity,
                         });
                         response.writeHead(200, "Succesful purchase", {
                           "content-type": "application/json",
