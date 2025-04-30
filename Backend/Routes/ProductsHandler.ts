@@ -101,6 +101,14 @@ export const listProducts = async (
                 );
               } else {
                 try {
+                  if (User.id != itemInfo.sellerid) {
+                    response.writeHead(403);
+                    response.end(
+                      "Invalid user token, the seller id and user id do not match"
+                    );
+                    return;
+                  }
+
                   await Products.insertOne({
                     id: crypto.randomBytes(16).toString("hex"),
                     name: itemInfo.name,
