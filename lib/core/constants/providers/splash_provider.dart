@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/pages/Additems.page.dart';
+import 'package:marikiti/Widgets/pages/vendor_add_items.dart';
 
 class SplashProvider with ChangeNotifier {
   bool _isVisible = false;
@@ -11,7 +13,8 @@ class SplashProvider with ChangeNotifier {
     });
 
     Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, "/home");
+      // Navigator.pushReplacementNamed(context, "/home");
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AddProductPage()));
     });
   }
 }
