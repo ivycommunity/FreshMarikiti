@@ -118,9 +118,8 @@ export const listProducts = async (
                   response.end("Product added");
                   return;
                 } catch (error) {
-                  console.log(error);
                   response.writeHead(500);
-                  response.end("Server error, please try again");
+                  response.end("Server error, please try again" + error);
                   return;
                 }
               }
