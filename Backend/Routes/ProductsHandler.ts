@@ -108,6 +108,17 @@ export const listProducts = async (
                     );
                     return;
                   }
+                  let quantityParsed = Number.parseInt(itemInfo.quantity),
+                    amountParsed = Number.parseInt(itemInfo.amount);
+
+                  if (
+                    Number.isNaN(quantityParsed) ||
+                    Number.isNaN(amountParsed)
+                  ) {
+                    response.writeHead(409);
+                    response.end("Invalid quantity or amount passed in");
+                    return;
+                  }
 
                   await Products.insertOne({
                     id: crypto.randomBytes(16).toString("hex"),
@@ -117,16 +128,15 @@ export const listProducts = async (
                     seller: itemInfo.seller,
                     phonenumber: itemInfo.phonenumber,
                     image: itemInfo.image ? itemInfo.image : "",
-                    quantity: itemInfo.quantity,
+                    quantity: quantityParsed,
                     category: itemInfo.category,
                     comments: [],
-                    amount: itemInfo.amount,
+                    amount: amountParsed,
                   });
                   response.writeHead(201);
                   response.end("Product added");
                   return;
                 } catch (error) {
-                  console.log(error);
                   response.writeHead(500);
                   response.end("Server error, please try again" + error);
                   return;
