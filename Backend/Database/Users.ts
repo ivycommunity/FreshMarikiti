@@ -18,7 +18,6 @@ export interface User {
   google: boolean;
   goals?: string;
   biocoins: number;
-  cart: Product[];
 }
 
 const Schema = new mongoose.Schema<User>({
@@ -44,10 +43,6 @@ const Schema = new mongoose.Schema<User>({
   },
   google: {
     type: mongoose.SchemaTypes.Boolean,
-    required: true,
-  },
-  cart: {
-    type: mongoose.SchemaTypes.Mixed,
     required: true,
   },
 });

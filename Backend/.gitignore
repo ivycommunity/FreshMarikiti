@@ -8,3 +8,5 @@
 /Database/*.js
 /Testing/**/*.js
 /*.js
+
+/fresh-mar-server-firebase-adminsdk-fbsvc-5917950009.json

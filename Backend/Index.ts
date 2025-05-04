@@ -16,10 +16,12 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  listProduct,
 } from "./Routes/ProductsHandler";
-import { Transact } from "./Routes/CurrencyHandler";
+import { InitiateOrder, UpdateOrder } from "./Routes/CurrencyHandler";
 import { FeedbackRoute } from "./Routes/FeedbackHandler";
 import { Socket, Server } from "socket.io";
+import { Product } from "./Database/Products";
 
 dotenv.config({
   path: "./.env",
@@ -109,8 +111,11 @@ const server = http.createServer(
           case "redirect":
             Redirect(request, response);
             break;
+          case "order":
+            InitiateOrder(request, response, io);
+            break;
           case "transact":
-            Transact(request, response);
+            UpdateOrder(request, response);
             break;
           default:
             response.writeHead(404, "Invalid Route");
@@ -122,6 +127,9 @@ const server = http.createServer(
           switch (urlSegment[2]) {
             case "list":
               listProducts(request, response);
+              break;
+            case "specific":
+              listProduct(request, response);
               break;
             case "add":
               if (request.method == "POST") addProduct(request, response);
@@ -174,7 +182,7 @@ const server = http.createServer(
     },
   });
 
-io.use((socket, next) => {
+io.use((socket: Socket, next) => {
   const username = socket.handshake.auth.userName;
 
   if (!username) console.log("Does not exist");
@@ -211,6 +219,16 @@ io.on("connection", (socket: Socket) => {
       from: socket.id,
     });
   });
+
+  socket.on(
+    "Transaction Initiated",
+    ({ seller, product }: { seller: Product; product: Product }) => {
+      socket.emit("Transaction Initiated", {
+        Seller: seller.name,
+        Product: product.name,
+      });
+    }
+  );
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("user-disconnected", users[socket.id]);
