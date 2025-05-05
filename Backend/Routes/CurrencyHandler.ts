@@ -1,13 +1,12 @@
 import { retrieveUser } from "./AccountCRUD";
 import Users from "../Database/Users";
 import { IncomingMessage, ServerResponse } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import Products from "../Database/Products";
 import Order from "../Database/Order";
 import * as crypto from "crypto";
 import * as JWT from "jsonwebtoken";
 import { sendNotification } from "./NofiticationsHandler";
-import { createSemanticDiagnosticsBuilderProgram } from "typescript";
 
 export type Transacters = {
   buyerid: string;
