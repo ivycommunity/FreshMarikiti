@@ -123,7 +123,7 @@ const DataStore: Validator = async (type, Data) => {
   },
   generateUserToken = async (payload: any) => {
     const accessToken = jwt.sign(payload, jwtAccessT as string, {
-      expiresIn: "950s",
+      expiresIn: "36500s",
     });
 
     return {

@@ -22,14 +22,14 @@ import { InitiateOrder, UpdateOrder } from "./Routes/CurrencyHandler";
 import { FeedbackRoute } from "./Routes/FeedbackHandler";
 import { Socket, Server } from "socket.io";
 import { Product } from "./Database/Products";
+import SocketDb from "./Database/Socket";
 
 dotenv.config({
   path: "./.env",
 });
 
 const portNumber = process.env.PORT,
-  mongoUri = process.env.MONGO_URI,
-  users: Record<string, string> = {};
+  mongoUri = process.env.MONGO_URI;
 
 const server = http.createServer(
     async (
@@ -182,32 +182,57 @@ const server = http.createServer(
     },
   });
 
-io.use((socket: Socket, next) => {
-  const username = socket.handshake.auth.userName;
+io.use(async (socket: Socket, next) => {
+  const accessToken = socket.handshake.auth.token;
 
-  if (!username) console.log("Does not exist");
+  if (!accessToken) return next(new Error("Authentication error"));
 
-  socket.username = username;
+  try {
+    const user = await retrieveUser(accessToken);
+
+    if (typeof user !== "string") {
+      socket.userId = user.id;
+      socket.username = user.name;
+      next();
+    }
+  } catch (error) {
+    return next(new Error("Access token is invalid"));
+  }
+
   next();
 });
 
-io.on("connection", (socket: Socket) => {
+io.on("connection", async (socket: Socket) => {
   const socketsMap = io.of("/").sockets;
   let usersPresent: Record<string, string>[] = [];
 
+  if (socket.userId) {
+    try {
+      const currentUser = await SocketDb.findOne({ userId: socket.userId });
+
+      if (currentUser) {
+        await currentUser.updateOne({
+          socketId: socket.id,
+          connectedAt: new Date(),
+        });
+
+        console.log("Connected using ", socket.id);
+      } else {
+        const socketUser = await SocketDb.insertOne({
+          userId: socket.userId,
+          socketId: socket.id,
+          connectedAt: new Date(),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   socket.broadcast.emit("user-connected", {
-    id: socket.id,
+    id: socket.userId,
     username: socket.username,
   });
-
-  socketsMap.forEach((socket, socketId) => {
-    usersPresent.push({
-      id: socketId,
-      username: socket.username as string,
-    });
-  });
-
-  socket.emit("users", usersPresent);
 
   socket.onAny((events, ...args) => {
     console.log(events, args);
@@ -216,7 +241,7 @@ io.on("connection", (socket: Socket) => {
   socket.on("private message", ({ content, to }) => {
     socket.to(to).emit("private message", {
       content,
-      from: socket.id,
+      from: socket.userId,
     });
   });
 
@@ -231,9 +256,10 @@ io.on("connection", (socket: Socket) => {
   );
 
   socket.on("disconnect", () => {
-    socket.broadcast.emit("user-disconnected", users[socket.id]);
-    delete users[socket.id];
-    delete users[socket.id];
+    socket.broadcast.emit("offline", {
+      userId: socket.userId,
+      username: socket.username,
+    });
   });
 });
 

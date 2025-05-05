@@ -6,6 +6,8 @@ import Products from "../Database/Products";
 import Order from "../Database/Order";
 import * as crypto from "crypto";
 import * as JWT from "jsonwebtoken";
+import { sendNotification } from "./NofiticationsHandler";
+import { createSemanticDiagnosticsBuilderProgram } from "typescript";
 
 export type Transacters = {
   buyerid: string;
@@ -247,6 +249,13 @@ export const updateFunds = async (
                       });
 
                       await Order.deleteOne({ id: orderFinder.id });
+
+                      if (Product.quantity < 5)
+                        sendNotification({
+                          title: "Stock deficit",
+                          body: `Your stock of ${Product.name} is at ${Product.quantity}`,
+                          token: "",
+                        });
 
                       response.writeHead(200, "Transaction successful");
                       response.end();

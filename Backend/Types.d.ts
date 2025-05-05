@@ -7,7 +7,8 @@ declare global {
 declare module "socket.io" {
   interface Socket {
     username?: string;
+    userId?: string;
   }
 }
-// Hello there
+
 export {};
