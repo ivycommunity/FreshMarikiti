@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marikiti/Widgets/home_page_drawer.dart';
 
 class HomePage2 extends StatelessWidget {
   const HomePage2({super.key});
@@ -10,7 +11,7 @@ class HomePage2 extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             "Earnings",
             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
           ),
@@ -20,24 +21,24 @@ class HomePage2 extends StatelessWidget {
           actions: [
             Builder(
               builder: (context) => IconButton(
-                icon: Icon(Icons.menu, color: Colors.white),
+                icon: const Icon(Icons.menu, color: Colors.white),
                 onPressed: () {
-                  Scaffold.of(context).openDrawer();
+                  Scaffold.of(context).openEndDrawer(); // Opens the drawer
                 },
               ),
             ),
           ],
           leading: IconButton(
             onPressed: () {
-              //Navigator.push(
-              //context, MaterialPageRoute(builder: (context) => CartPage()));
+              // Navigator.push(
+              // context, MaterialPageRoute(builder: (context) => CartPage()));
             },
             icon: CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              child: Icon(Icons.notifications, color: Colors.white),
+              child: const Icon(Icons.notifications, color: Colors.white),
             ),
           ),
-          bottom: TabBar(
+          bottom: const TabBar(
             indicatorColor: Colors.black, // Underline color
             labelColor: Colors.black, // Selected tab color
             unselectedLabelColor: Colors.grey, // Unselected tab color
@@ -48,54 +49,92 @@ class HomePage2 extends StatelessWidget {
             ],
           ),
         ),
+        
+        endDrawer: const HomePageDrawer(),
+        
         body: const TabBarView(
           children: [
             // Content for "Items" tab
             ItemsTab(),
 
             // Content for "Orders" tab
-            Center(child: Text("Ongoing order"),),
             OrdersTab(),
 
             // Content for "Rating" tab
-            Center(child: Text("Rating Content"),),
             RatingTab(),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Define the action when the button is pressed
-            print("Profile Button Pressed");
-          },
-          child: Icon(Icons.person),
-          //backgroundColor: Theme.of(context).colorScheme.primary,
-          elevation: 0,
+        
+        // Using a Stack for multiple floating action buttons
+        floatingActionButton: Stack(
+          children: [
+            // Left positioned button (add button)
+            Positioned(
+              left: 30,
+              bottom: 0,
+              child: FloatingActionButton(
+                heroTag: "btn1", // Required to avoid Flutter error with multiple FABs
+                onPressed: () {
+                  print("Add Button Pressed");
+                },
+                child: const Icon(Icons.add),
+              ),
+            ),
+            
+            // Center positioned button (profile button)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Align(
+                alignment: Alignment.center,
+                child: FloatingActionButton(
+                  heroTag: "btn2",
+                  onPressed: () {
+                    print("Profile Button Pressed");
+                  },
+                  child: const Icon(Icons.person),
+                ),
+              ),
+            ),
+            
+            // Right positioned button (messages button)
+            Positioned(
+              right: 30,
+              bottom: 0,
+              child: FloatingActionButton(
+                heroTag: "btn3",
+                onPressed: () {
+                  print("Messages Button Pressed");
+                },
+                child: const Icon(Icons.message),
+              ),
+            ),
+          ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
 }
-
 
 class ItemsTab extends StatelessWidget {
   const ItemsTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      );
+    return const Center(
+      child: Text("Items Content"),
+    );
   }
 }
-
 
 class OrdersTab extends StatelessWidget {
   const OrdersTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-
+    return const Center(
+      child: Text("Orders Content"),
     );
   }
 }
@@ -105,8 +144,8 @@ class RatingTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      
+    return const Center(
+      child: Text("Rating Content"),
     );
   }
 }
