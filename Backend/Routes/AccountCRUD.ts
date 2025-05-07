@@ -8,7 +8,6 @@ import * as jwt from "jsonwebtoken";
 import * as crypto from "crypto";
 import * as bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
-import { isBuffer } from "util";
 
 dotenv.config({
   path: "./.env",
@@ -124,7 +123,7 @@ const DataStore: Validator = async (type, Data) => {
   },
   generateUserToken = async (payload: any) => {
     const accessToken = jwt.sign(payload, jwtAccessT as string, {
-      expiresIn: "950s",
+      expiresIn: "36500s",
     });
 
     return {
@@ -158,7 +157,6 @@ export const Signup = (
               email: userData.email,
               biocoins: userDetails?.biocoins,
               goals: userDetails?.goals,
-              cart: userDetails?.cart,
             });
 
             if (user instanceof Error == false) {
@@ -235,7 +233,6 @@ export const Signup = (
                 email: userDetails.email,
                 biocoins: userDetails.biocoins,
                 goals: userDetails.goals,
-                cart: userDetails.cart,
               });
 
               if (encodedUser instanceof Error == false) {
@@ -485,6 +482,7 @@ export const Signup = (
                         { id: userDetails.id },
                         { email: value }
                       );
+
                       if (update) updatedValues.push("email");
                       else updatedValues.push("emailfail");
                     } else {
@@ -502,6 +500,7 @@ export const Signup = (
                         { id: userDetails.id },
                         { password: bcrypt.hashSync(value as string, 10) }
                       );
+
                       if (update) updatedValues.push("password");
                       else updatedValues.push("passwordfail");
                     }
@@ -511,17 +510,9 @@ export const Signup = (
                         { id: userDetails.id },
                         { name: userDetails.name }
                       );
+
                       if (update) updatedValues.push("name");
                       else updatedValues.push("namefail");
-                    }
-                  } else if (key == "cart") {
-                    if (Array.isArray(value)) {
-                      let update = await UserSchema.updateOne(
-                        { id: userDetails.id },
-                        { cart: value }
-                      );
-                      if (update) updatedValues.push("cart");
-                      else updatedValues.push("cartfail");
                     }
                   } else if (key == "goals") {
                     if (typeof value == "string" && value.length > 0) {

@@ -15,6 +15,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
+    "firebase-admin": "^13.3.0",
     "follow-redirects": "^1.15.9",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
@@ -29,6 +30,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
+    "@types/firebase": "^2.4.32",
     "@types/follow-redirects": "^1.14.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.14",

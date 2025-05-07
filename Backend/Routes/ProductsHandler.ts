@@ -16,6 +16,10 @@ type ProductUpdateBody = {
   category?: string;
   comments?: feedback[];
 };
+type Product = {
+  sellerid: string;
+  productid: string;
+};
 
 export const verifyUser = async (
   accessToken: string
@@ -46,8 +50,6 @@ export const listProducts = async (
         if (sellerProducts.length > 0)
           return response.end(JSON.stringify(sellerProducts));
         else return response.end("No products found");
-
-        return;
       } else {
         switch (User) {
           case "User doesn't exist in database":
@@ -64,6 +66,79 @@ export const listProducts = async (
       response.writeHead(401);
       response.end("Unauthenticated user, authenticate yourself first");
       return;
+    }
+  },
+  listProduct = async (
+    request: IncomingMessage,
+    response: ServerResponse<IncomingMessage>
+  ) => {
+    let userToken = request.headers["user-token"];
+
+    if (userToken) {
+      let User = await verifyUser(userToken as string);
+
+      if (typeof User !== "string") {
+        let productInfo: any = "";
+
+        request.on("data", (Body: Buffer) => {
+          productInfo += Body.toString();
+        });
+
+        request.on("end", async () => {
+          try {
+            let Product: Product = JSON.parse(productInfo);
+
+            if (!Product.productid || !Product.sellerid) {
+              response.writeHead(
+                409,
+                "Incomplete credentials, ensure to provide seller id and product id"
+              );
+              response.end();
+              return;
+            }
+
+            if (Product.sellerid == User.id) {
+              let productFinder = await Products.findOne({
+                sellerid: Product.sellerid,
+                id: Product.productid,
+              });
+
+              if (productFinder) {
+                response.writeHead(200);
+                response.end(JSON.stringify(productFinder));
+                return;
+              } else {
+                response.writeHead(404);
+                response.end("Product of such not found");
+                return;
+              }
+            } else {
+              response.writeHead(403, "User is not the same as product id");
+              response.end(
+                "Invalid id provided, user does not match the seller id"
+              );
+              return;
+            }
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              (error.name.includes("Syntax") ||
+                error.message.includes("Syntax"))
+            ) {
+              response.writeHead(403);
+              response.end("JSON error found, please format correctly");
+              return;
+            } else {
+              // response.writeHead(500);
+              // response.end("Server error located, please try again");
+              // return;
+            }
+          }
+        });
+      } else {
+        response.writeHead(404);
+        response.end("User does not exist");
+      }
     }
   },
   addProduct = async (
@@ -145,7 +220,7 @@ export const listProducts = async (
             }
           } catch (error) {
             response.writeHead(500);
-            response.write("Server error, please try again");
+            response.write("Server error, please try again" + error);
           }
         });
       } else {
