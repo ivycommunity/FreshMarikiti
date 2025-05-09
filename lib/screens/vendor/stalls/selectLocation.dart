@@ -228,6 +228,7 @@ class _SearchPlacesSheetState extends State<SearchPlacesSheet> {
       return;
     }
 
+    /* Commented out since it needs a Google Maps API key ----------------------------------
     final url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$value&key=$kGoogleApiKey&components=country:ke';
 
@@ -236,8 +237,10 @@ class _SearchPlacesSheetState extends State<SearchPlacesSheet> {
       final data = json.decode(response.body);
       setState(() => _predictions = data['predictions']);
     }
+    */
   }
 
+  /* Commented out since it needs a Google Maps API key ----------------------------------
   Future<void> _selectPlace(String placeId) async {
     final url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$kGoogleApiKey';
@@ -256,6 +259,7 @@ class _SearchPlacesSheetState extends State<SearchPlacesSheet> {
       );
     }
   }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -302,7 +306,7 @@ class _SearchPlacesSheetState extends State<SearchPlacesSheet> {
                             color: Theme.of(context).textTheme.bodyLarge!.color,
                           ),
                         ),
-                        onTap: () => _selectPlace(p['place_id']),
+                        //onTap: () => _selectPlace(p['place_id']),               //Commented out since it needs a Google Maps API key ---------------------------------- 
                       ),
                     );
                   },
