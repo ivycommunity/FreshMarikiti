@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Flutter (lib/screens/admin/admin_orders.dart)",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/screens/admin/admin_orders.dart"
+        },
+        {
+            "name": "Flutter (lib/screens/admin/admin_orders.dart)",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/screens/admin/admin_orders.dart"
+        }
+    ]
+}
