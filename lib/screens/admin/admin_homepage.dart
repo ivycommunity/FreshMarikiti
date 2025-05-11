@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:sokoni/screens/admin/admin_profile.dart';
 import 'package:sokoni/screens/admin/register_vendor.dart';
 import 'package:sokoni/screens/settings.dart';
+import 'package:sokoni/screens/admin/admin_orders_details.dart';
+import 'package:sokoni/screens/admin/admin_sales_details.dart';
+import 'package:sokoni/screens/admin/admin_stalls_details.dart';
+import 'package:sokoni/screens/admin/admin_vendors_details.dart';
 
 class AdminHomePage extends StatefulWidget {
   const AdminHomePage({super.key});
@@ -197,6 +201,40 @@ class _AdminHomePageState extends State<AdminHomePage> {
     );
   }
 
+// Navigation for overview cards
+  void _navigateToDetailsPage(String cardType) {
+    switch(cardType) {
+      case "Vendors":
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => const AdminVendorsDetails())
+        );
+        break;
+      case "Sales":
+        //Navigator.push(
+          //context, 
+          //MaterialPageRoute(builder: (context) => AdminSalesPage())
+        //);
+        break;
+      case "Orders":
+        //Navigator.push(
+          //context, 
+          //MaterialPageRoute(builder: (context) => AdminOrdersPage())
+        //);
+        break;
+      case "Stalls":
+        //Navigator.push(
+          //context, 
+          //MaterialPageRoute(builder: (context) => ProductsDetailsPage())
+        //);
+        break;
+      default:
+        // Fallback in case of unexpected card type
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$cardType details page coming soon"))
+        );
+    }
+  }
 
   Widget _buildOverviewCards(ThemeData theme, bool isDark) {
     return GridView.count(
@@ -214,6 +252,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           isDark ? Colors.green.shade300 : Colors.green,
           theme,
           isDark,
+          () => _navigateToDetailsPage("Vendors"),
         ),
         _overviewCard(
           "Sales",
@@ -222,6 +261,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           isDark ? Colors.orange.shade300 : Colors.orange,
           theme,
           isDark,
+          () => _navigateToDetailsPage("Sales"),
         ),
         _overviewCard(
           "Orders",
@@ -230,6 +270,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           isDark ? Colors.purple.shade300 : Colors.purple,
           theme,
           isDark,
+          () => _navigateToDetailsPage("Orders"),
         ),
         _overviewCard(
           "Products",
@@ -238,6 +279,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           isDark ? Colors.red.shade300 : Colors.redAccent,
           theme,
           isDark,
+          () => _navigateToDetailsPage("Products"),
         ),
       ],
     );
@@ -251,54 +293,58 @@ class _AdminHomePageState extends State<AdminHomePage> {
       Color color,
       ThemeData theme,
       bool isDark,
+      VoidCallback onTap,
       ) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Container(
-          padding: const EdgeInsets.all(12),
-
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white24),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, // allows height to adjust
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            padding: const EdgeInsets.all(12),
+      
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white24),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, // allows height to adjust
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, size: 26, color: color),
                 ),
-                child: Icon(icon, size: 26, color: color),
-              ),
-              const SizedBox(height: 12),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  value,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: theme.textTheme.titleMedium?.color,
+                const SizedBox(height: 12),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: theme.textTheme.titleMedium?.color,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
