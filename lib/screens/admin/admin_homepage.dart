@@ -94,13 +94,21 @@ class _AdminHomePageState extends State<AdminHomePage> {
             const SizedBox(height: 24),
 
             // Vendors Section
-            _buildSectionHeader(theme, "Vendors", "View All", () {}),
+            _buildSectionHeader(theme, "Vendors", "View All", () => Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => const AdminVendorsDetails())
+        ),),
             const SizedBox(height: 12),
             _buildVendorList(theme, isDark),
             const SizedBox(height: 24),
 
             // Stalls Section
-            _buildSectionHeader(theme, "Stalls", "View All", () {}),
+            _buildSectionHeader(theme, "Stalls", "View All", () {} //Uncomment to navigate to stalls details
+            // => Navigator.push(
+          //context, 
+          //MaterialPageRoute(builder: (context) => const AdminStallsDetails())
+        //),
+        ),
             const SizedBox(height: 12),
             _buildStallsList(theme, isDark),
             const SizedBox(height: 24),
@@ -211,21 +219,21 @@ class _AdminHomePageState extends State<AdminHomePage> {
         );
         break;
       case "Sales":
-        //Navigator.push(
-          //context, 
-          //MaterialPageRoute(builder: (context) => AdminSalesPage())
-        //);
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => AdminSalesDetails())
+        );
         break;
       case "Orders":
-        //Navigator.push(
-          //context, 
-          //MaterialPageRoute(builder: (context) => AdminOrdersPage())
-        //);
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => AdminOrdersDetails())
+        );
         break;
       case "Stalls":
         //Navigator.push(
           //context, 
-          //MaterialPageRoute(builder: (context) => ProductsDetailsPage())
+          //MaterialPageRoute(builder: (context) => AdminStallsDetails())
         //);
         break;
       default:
@@ -273,13 +281,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
           () => _navigateToDetailsPage("Orders"),
         ),
         _overviewCard(
-          "Products",
+          "Stalls",
           "600",
           Icons.category_outlined,
           isDark ? Colors.red.shade300 : Colors.redAccent,
           theme,
           isDark,
-          () => _navigateToDetailsPage("Products"),
+          () => _navigateToDetailsPage("Stalls"),
         ),
       ],
     );
@@ -434,11 +442,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 Text('Products: ${vendor['products']}'),
               ],
             ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
-            ),
-            onTap: () {},
+            //trailing: Icon(
+              //Icons.chevron_right,
+              //color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+            //),
+            //onTap: () {},
           ),
         );
       },
