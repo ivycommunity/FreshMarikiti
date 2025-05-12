@@ -1,9 +1,7 @@
-import { retrieveUser } from "../Routes/AccountCRUD";
 import { updateFunds } from "../Routes/CurrencyHandler";
 import { IncomingMessage, ServerResponse } from "http";
 import * as dotenv from "dotenv";
 import * as https from "https";
-import { time } from "console";
 
 dotenv.config({
   path: "./.env",
@@ -150,66 +148,50 @@ export const Payment = async (
     request: IncomingMessage,
     response: ServerResponse<IncomingMessage>
   ) => {
-    let userToken = request.headers["user-token"];
+    let paymentInfo: any = "";
 
-    if (userToken) {
-      let user = await retrieveUser(userToken as string),
-        paymentInfo: any = "";
+    request.on("data", (paymentData: Buffer) => {
+      paymentInfo += paymentData;
+    });
+    request.on("end", async () => {
+      if (paymentInfo != "") {
+        paymentInfo = JSON.parse(paymentInfo);
 
-      if (typeof user !== "string") {
-        request.on("data", (paymentData: Buffer) => {
-          paymentInfo += paymentData;
-        });
-        request.on("end", async () => {
-          if (paymentInfo != "") {
-            paymentInfo = JSON.parse(paymentInfo);
-
-            if (!paymentInfo.amount || !paymentInfo.phonenumber) {
-              response.writeHead(409);
-              response.end(
-                "Incomplete credentials, pass in a phonenumber and amount, ensure key fields are in small letters"
-              );
-            } else {
-              new Promise(async (resolve, reject) => {
-                let PaymentProcess = await makePayment(
-                  paymentInfo.phonenumber,
-                  paymentInfo.amount
-                );
-
-                if (PaymentProcess instanceof Error == false)
-                  resolve(PaymentProcess);
-                else reject(PaymentProcess);
-              })
-                .then(() => {
-                  global.User = user.id;
-                  response.writeHead(201);
-                  response.end("Payment initiated");
-                })
-                .catch((error) => {
-                  response.writeHead(500);
-                  response.end(
-                    "Error in creating the payment request, please try again later" +
-                      error.message
-                  );
-                });
-            }
-          } else {
-            response.writeHead(409);
-            response.end(
-              "Ensure you pass in payment details i.e. phonenumber and amount"
+        if (!paymentInfo.amount || !paymentInfo.phonenumber) {
+          response.writeHead(409);
+          response.end(
+            "Incomplete credentials, pass in a phonenumber and amount, ensure key fields are in small letters"
+          );
+        } else {
+          new Promise(async (resolve, reject) => {
+            let PaymentProcess = await makePayment(
+              paymentInfo.phonenumber,
+              paymentInfo.amount
             );
-          }
-        });
+
+            if (PaymentProcess instanceof Error == false)
+              resolve(PaymentProcess);
+            else reject(PaymentProcess);
+          })
+            .then(() => {
+              response.writeHead(201);
+              response.end("Payment initiated");
+            })
+            .catch((error) => {
+              response.writeHead(500);
+              response.end(
+                "Error in creating the payment request, please try again later" +
+                  error.message
+              );
+            });
+        }
       } else {
-        response.writeHead(403);
-        response.end("Token is invalid, please log in or sign up");
+        response.writeHead(409);
+        response.end(
+          "Ensure you pass in payment details i.e. phonenumber and amount"
+        );
       }
-    } else {
-      response.writeHead(401);
-      response.end(
-        "Unauthenticated, pass in an authentication token to continue"
-      );
-    }
+    });
   },
   Redirect = async (
     request: IncomingMessage,

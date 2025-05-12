@@ -14,9 +14,6 @@ export type Transacters = {
   productid: string;
   quantity: number;
 };
-type Transactions = {
-  Transactions: Transacters[] | Transacters;
-};
 
 //Update funds --> Adds bioCoins
 //Transact --> Used between bioCoins
