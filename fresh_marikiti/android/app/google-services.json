@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "508208214291",
+    "project_id": "fresh-marikiti",
+    "storage_bucket": "fresh-marikiti.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508208214291:android:951c83595d47fd609f2ae6",
+        "android_client_info": {
+          "package_name": "com.example.fresh_marikiti"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZzRk9uBUcAwOlRTaBjtuo5mkDTrZRxUk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
